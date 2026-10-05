@@ -40,7 +40,7 @@ section > h2{font-size:13px; letter-spacing:.14em; color:var(--dim); padding-bot
 /* 写真 */
 .photos{margin:0 0 22px}
 /* 横に並べてスワイプ。写真は切らずに全体を見せ、余白には同じ写真をぼかして敷く */
-.gallery{display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
+.gallery{position:relative; display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
   scrollbar-width:thin; border-radius:3px}
 /* 枠の比率 = 表紙の写真の比率（--ar。横長は 16:9、縦長は 4:5 まで）。高さは画面の72%まで */
 .gallery{justify-content:safe center}
@@ -173,6 +173,17 @@ footer.site .ga{display:block; margin-top:6px; font-size:11.5px}
 section.maptop{margin-top:0; margin-bottom:22px}
 .dbphoto{margin:8px 0 0; font-size:13px}
 .dbphoto a{color:var(--fg2)}
+
+/* 写真の送りボタン（マウスで操作する端末だけ。JS が付ける。地図のカードの左右ボタンと同じ見た目） */
+.gwrap{position:relative}
+.gallery.js-nav{scrollbar-width:none}
+.gallery.js-nav::-webkit-scrollbar{display:none}
+.gnav{position:absolute; top:50%; transform:translateY(-50%); z-index:2; width:30px; height:44px; border:0; padding:0;
+  display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.4); color:#fff; cursor:pointer;
+  font-size:15px; opacity:0; transition:opacity .15s}
+.gwrap:hover .gnav, .gnav:focus-visible{opacity:1}
+.gnav.prev{left:0; border-radius:0 3px 3px 0}
+.gnav.next{right:0; border-radius:3px 0 0 3px}
 
 /* 今入れる文化財（営業中）のピン。地図アプリ（build_html.py が差し込む）と物件ページの位置の地図（build_pages.py が
    page.css の後ろに付ける）で共通。CSS だけで動かす（ぼかし・回転は使わない）。

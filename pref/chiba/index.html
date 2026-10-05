@@ -85,6 +85,23 @@
     } else if(a.getAttribute('data-ev')==='share_x'){ track('share',{method:'x',content_type:'property',item_id:id}); }
     else { track('open_map',{property_id:id}); }
   });
+  // 写真の送りボタン（マウスで操作する端末だけ）。JS が動かなくても、写真は横スクロールで見られる
+  var g=document.querySelector('.gallery.multi');
+  if(g && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches){
+    var wrap=document.createElement('div'); wrap.className='gwrap';
+    g.parentNode.insertBefore(wrap,g); wrap.appendChild(g); g.classList.add('js-nav');
+    var slides=[].slice.call(g.querySelectorAll('.slide'));
+    var cur=function(){ var x=g.scrollLeft, k=0, b=1e9; slides.forEach(function(s,j){ var d=Math.abs(Math.min(s.offsetLeft, g.scrollWidth-g.clientWidth)-x); if(d<b){b=d;k=j;} }); return k; };
+    var go=function(d){ var k=(cur()+d+slides.length)%slides.length; g.scrollTo({left:slides[k].offsetLeft, behavior:'smooth'}); };
+    [['prev','‹','前の写真',-1],['next','›','次の写真',1]].forEach(function(b){
+      var el=document.createElement('button'); el.type='button'; el.className='gnav '+b[0]; el.textContent=b[1];
+      el.setAttribute('aria-label',b[2]); el.onclick=function(){ go(b[3]); }; wrap.appendChild(el);
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||'')) return;
+      if(e.key==='ArrowLeft'){ go(-1); e.preventDefault(); } else if(e.key==='ArrowRight'){ go(1); e.preventDefault(); }
+    });
+  }
 })();
 </script>
 </body>
