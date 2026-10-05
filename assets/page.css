@@ -1,9 +1,12 @@
 /* 物件ページ・一覧ページ共通（build_pages.py が assets/page.css にコピーする）
    地図（bunkazai_all_map.html）の明るい表示と同じ色づかい。端末が暗い表示なら暗くする。JS は使わない */
 :root{
-  --bg:#F4F4F2; --panel:#FFFFFF; --fg:#141416; --fg2:#26262B; --dim:#4A4A52; --dim2:#62626B;
-  --line:#D4D4DA; --line2:#A9A9B2; --hover:#EEEEF1; --tile:#EFEFF1; --sel:#141416; --sel-ink:#FFFFFF;
-  --map-filter:grayscale(.55) contrast(.96);
+  --bg:#F2F0EA; --panel:#FBFAF6; --fg:#1E1D1A; --fg2:#2E2C28; --dim:#57534B; --dim2:#6E6A61;
+  --line:#E0DCD2; --line2:#B8B2A6; --hover:#F1EEE6; --tile:#EFECE4; --sel:#1E1D1A; --sel-ink:#FBFAF6;
+  --map-filter:none;   /* 地理院地図には色をかけない */
+  --pin-main:#A6243A;  /* 位置の地図のピン（地図の印と同じ臙脂） */
+  --brand:#2F5B48; --brand-ink:#FFFFFF;
+  --font-head:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP",serif;
   --c0:#18a3bb; --c1:#024914; --c2:#16497c; --c3:#ba8c0c; --c4:#c17fac; --c5:#714ccd;
   --c6:#2aaa4c; --c7:#841b59; --c8:#067a5f; --c9:#854c17; --c10:#d43a4d; --c11:#7a89fe;
 }
@@ -11,7 +14,8 @@
   :root{
     --bg:#0B0B0C; --panel:#131316; --fg:#F2F2F2; --fg2:#E2E2E6; --dim:#B8B8BE; --dim2:#9A9AA2;
     --line:#2E2E33; --line2:#4A4A52; --hover:#1D1D22; --tile:#111113; --sel:#E6E6E6; --sel-ink:#0B0B0C;
-    --map-filter:invert(1) hue-rotate(180deg) grayscale(.75) brightness(.82) contrast(.92);
+    --map-filter:none;   /* 暗い表示でも地図はそのまま（暗くするのは文字と背景だけ） */
+    --pin-main:#BE3550; --brand:#6FAF92; --brand-ink:#0B0B0C;
     --c0:#00defc; --c1:#157e36; --c2:#1074a6; --c3:#9b8e02; --c4:#feadcb; --c5:#8c69dd;
     --c6:#76d27d; --c7:#b13a7f; --c8:#02aaa5; --c9:#f9a600; --c10:#ec697b; --c11:#93a8fe;
   }
@@ -24,6 +28,7 @@ body{margin:0; background:var(--bg); color:var(--fg);
 a{color:var(--fg); text-decoration:none; border-bottom:1px solid var(--line2)}
 a:hover{border-bottom-color:var(--fg)}
 h1,h2,h3{font-weight:500; line-height:1.4; margin:0}
+h1.name, section > h2, .hl .memo .lbl{font-family:var(--font-head)}
 
 .top{border-bottom:1px solid var(--line); background:var(--panel)}
 .top .in{max-width:880px; margin:0 auto; padding:10px 16px; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px}
@@ -35,7 +40,7 @@ h1,h2,h3{font-weight:500; line-height:1.4; margin:0}
 
 main{max-width:880px; margin:0 auto; padding:20px 16px 48px}
 section{margin-top:34px}
-section > h2{font-size:13px; letter-spacing:.14em; color:var(--dim); padding-bottom:7px; border-bottom:1px solid var(--line); margin-bottom:14px}
+section > h2{font-size:17px; font-weight:600; letter-spacing:.08em; color:var(--fg); padding-bottom:8px; border-bottom:1px solid var(--line); margin-bottom:14px}
 
 /* 写真 */
 .photos{margin:0 0 22px}
@@ -60,12 +65,16 @@ section > h2{font-size:13px; letter-spacing:.14em; color:var(--dim); padding-bot
 /* 見出しまわり */
 .cat{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--dim)}
 .sw{display:inline-block; width:9px; height:9px; border-radius:50%; flex:0 0 9px; background:var(--dim2)}
-h1.name{font-size:26px; margin-top:6px; letter-spacing:.02em}
+h1.name{font-size:28px; font-weight:600; margin-top:6px; letter-spacing:.03em}
 .kana{font-size:13px; color:var(--dim); margin-top:2px}
 .variant{font-size:13px; color:var(--fg2); margin-top:6px}
 .variant b{font-weight:500}
 .src{font-size:12px; color:var(--dim); margin-top:12px}
 .lead{font-size:14px; color:var(--fg2); margin-top:12px}
+.lead .ly{display:block; color:var(--dim)}
+.hl .memo{margin-bottom:18px}
+.hl .memo .lbl{font-size:13px; color:var(--dim); margin:0 0 4px; letter-spacing:.06em}
+section .src{margin-top:12px}
 
 /* 基本データ */
 table.facts{width:100%; border-collapse:collapse; font-size:14px}
@@ -75,14 +84,14 @@ table.facts td{padding:7px 0; border-bottom:1px solid var(--line); color:var(--f
 .note{font-size:12px; color:var(--dim2); margin-top:8px}
 
 /* 文化庁の解説（引用） */
-blockquote.quote{margin:16px 0 0; padding:12px 16px; border-left:3px solid var(--line2); background:var(--panel); border-radius:0 3px 3px 0; color:var(--fg2)}
+blockquote.quote{margin:0; padding:4px 0 4px 18px; border-left:2px solid var(--line2); background:none; color:var(--fg2); line-height:1.95}
 blockquote.quote p{margin:0}
 blockquote.quote footer{font-size:12px; color:var(--dim); margin-top:8px}
 
 /* 独自コンテンツ */
 .prose p{margin:0 0 12px}
 .prose ul{margin:0 0 12px; padding-left:1.3em}
-.visit{display:inline-block; font-size:13px; padding:3px 10px; border-radius:3px; background:var(--sel); color:var(--sel-ink); margin-bottom:10px}
+.visit{display:inline-block; font-size:13px; padding:2px 10px; border:1px solid var(--line2); border-radius:3px; color:var(--fg2); margin-bottom:10px}
 
 /* 位置（地理院タイルを並べた静的な地図。JS なし） */
 .smap{position:relative; height:260px; overflow:hidden; border-radius:3px; border:1px solid var(--line); background:var(--tile)}
@@ -102,7 +111,8 @@ blockquote.quote footer{font-size:12px; color:var(--dim); margin-top:8px}
 .maplinks{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
 .btn{display:inline-block; font-size:13px; padding:7px 14px; border:1px solid var(--line2); border-radius:3px; color:var(--fg2)}
 .btn:hover{background:var(--hover); color:var(--fg)}
-.btn.primary{background:var(--sel); color:var(--sel-ink); border-color:var(--sel)}
+.btn{min-height:40px; display:inline-flex; align-items:center}
+.btn.primary{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}   /* 主な操作だけ深緑（地図と同じ） */
 .coords{font-size:12px; color:var(--dim2); margin-top:6px; font-variant-numeric:tabular-nums}
 
 /* 近くの文化財・一覧 */
@@ -184,6 +194,17 @@ section.maptop{margin-top:0; margin-bottom:22px}
 .gwrap:hover .gnav, .gnav:focus-visible{opacity:1}
 .gnav.prev{left:0; border-radius:0 3px 3px 0}
 .gnav.next{right:0; border-radius:3px 0 0 3px}
+
+/* 行きたい（保存）: 丸い枠のボタンと星（地図のカードと同じ形。訪問の記録とは別の操作） */
+.savep{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin:12px 0 0}
+.savep[hidden]{display:none}
+.sbtn{border:1.5px solid var(--pin-main); border-radius:20px; color:var(--pin-main); background:transparent; font:inherit; font-size:14px;
+  font-weight:600; padding:0 16px; gap:6px; cursor:pointer}
+.sbtn[aria-pressed="true"]{background:var(--pin-main); color:#fff}
+.sbtn .st{font-size:15px; line-height:1}
+.savep .note{font-size:12px; color:var(--dim2)}
+.savep .svlist{font-size:12.5px}
+.savep .svlist[hidden]{display:none}
 
 /* 今入れる文化財（営業中）のピン。地図アプリ（build_html.py が差し込む）と物件ページの位置の地図（build_pages.py が
    page.css の後ろに付ける）で共通。CSS だけで動かす（ぼかし・回転は使わない）。

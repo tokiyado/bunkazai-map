@@ -14,7 +14,7 @@
 <meta property="og:url" content="https://bunkazai.tokiyado.net/pref/hyogo/28228/">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="../../../assets/page.css">
+<link rel="stylesheet" href="../../../assets/page.css?v=9c1bf9cb0a">
 <script>(function(){if(location.hostname!=='bunkazai.tokiyado.net')return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('js',new Date());gtag('config','G-W8EHXMSRNE');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-W8EHXMSRNE';document.head.appendChild(s);})();</script>
 </head>
 <body>
@@ -40,6 +40,28 @@
     } else if(a.getAttribute('data-ev')==='share_x'){ track('share',{method:'x',content_type:'property',item_id:id}); }
     else { track('open_map',{property_id:id}); }
   });
+  // 行きたい（保存）: 地図と同じ localStorage 'bunkazai-saved'（{物件ID: 保存した日時}）
+  var sp=document.querySelector('.savep'), sb=document.getElementById('saveBtn');
+  if(sp && sb && id){
+    var KEY='bunkazai-saved', label=sb.querySelector('.sl').textContent;
+    var load=function(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'{}'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }catch(e){ return null; } };
+    var draw=function(){ var o=load()||{}, on=typeof o[id]==='string';
+      sb.setAttribute('aria-pressed', on?'true':'false');
+      sb.querySelector('.st').textContent = on?'★':'☆';
+      sb.querySelector('.sl').textContent = on?'保存済み':label;
+      sp.querySelector('.svlist').hidden = !Object.keys(o).length; };
+    if(load()!==null){
+      sp.hidden=false; draw();
+      sb.addEventListener('click', function(){
+        var o=load()||{}, on=typeof o[id]!=='string';
+        if(on) o[id]=new Date().toISOString(); else delete o[id];
+        try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){ sb.querySelector('.sl').textContent='この端末では保存できません'; return; }
+        track(on?'save_property':'unsave_property', {property_id:id, link_location:'page'});
+        draw();
+      });
+      window.addEventListener('storage', function(e){ if(e.key===KEY) draw(); });
+    }
+  }
   // 写真の送りボタン（マウスで操作する端末だけ）。JS が動かなくても、写真は横スクロールで見られる
   var g=document.querySelector('.gallery.multi');
   if(g && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches){
