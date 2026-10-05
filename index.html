@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 11:09） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 12:08） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -69,8 +69,35 @@ button,input,select{font-family:inherit; font-size:inherit; color:inherit}
 /* ---- top bar ---- */
 #topbar{
   flex:0 0 auto; height:46px; display:flex; align-items:center; gap:14px;
-  padding:0 16px; border-bottom:1px solid var(--line);
+  padding:0 16px; border-bottom:1px solid var(--line); background:var(--panel); position:relative; z-index:1200;
 }
+/* サイト名 */
+#topbar a.brand.title{display:flex; align-items:baseline; gap:8px; white-space:nowrap; text-decoration:none; border:0;
+  color:var(--fg); font-size:14px; font-weight:500; letter-spacing:.06em}
+#topbar a.brand.title:hover{color:var(--fg); text-decoration:underline; text-underline-offset:4px; text-decoration-thickness:1px}
+#topbar a.brand.title:hover .by{color:var(--dim)}
+#topbar a.brand .by{font-size:10.5px; font-weight:400; color:var(--dim2); letter-spacing:.04em}
+/* メニュー: パソコンは横並び、スマホは「≡」で開く */
+#menu{display:flex; align-items:center; gap:4px}
+.mitem{background:transparent; border:0; border-radius:3px; padding:6px 10px; color:var(--fg2); font-size:12px;
+  letter-spacing:.06em; cursor:pointer; white-space:nowrap}
+.mitem:hover{background:var(--hover2); color:var(--fg)}
+.mitem .n{margin-left:5px; color:var(--dim); font-variant-numeric:tabular-nums}
+#menuBtn{display:none; width:38px; height:34px; border:1px solid var(--line); border-radius:3px; background:transparent;
+  color:var(--fg); font-size:19px; line-height:1; cursor:pointer}
+body.nophoto #tileBtn{display:none}
+/* 検索窓（パソコンはヘッダーの中、スマホは地図の上に浮かせる） */
+#searchBox{margin:0; position:relative}
+#searchBox h3, #searchBox .pool{display:none}
+#searchBox .sugg{position:absolute; left:0; right:0; top:100%; z-index:20; box-shadow:0 6px 18px rgba(0,0,0,.18)}
+#searchSlotTop{flex:0 1 380px; min-width:180px}
+#searchSlotTop #q{height:32px; border-radius:16px; padding:0 14px}
+#searchFloat{display:none}
+/* 現在地ボタン（地図の右下） */
+.loc-btn{width:34px; height:34px; border:0; background:var(--input-bg); color:var(--fg); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1}
+.loc-btn:hover{background:var(--hover2)}
+.loc-btn.on{color:#1a73e8}
 #topbar .title{font-weight:300; letter-spacing:.14em; font-size:11px; color:var(--dim)}
 #topbar .title b{font-weight:400; color:var(--fg)}
 #topbar .spacer{margin-left:auto}
@@ -404,6 +431,7 @@ select:focus{border-color:var(--line2)}
 /* パソコン: 右に物件カード・ようこそが出ている間は、見えている地図の範囲（右のパネルの分を除く）の中央、
    狭ければ拡大縮小ボタンの右隣に置く。それでも入りきらない幅では2段にして、どのボタンもパネルの下に隠れないようにする */
 @media (min-width: 769px){
+  body.side-open .leaflet-bottom.leaflet-right{right:378px}
   body.side-open #mineFloat{left:max(52px, calc((100% - 378px) / 2 - 190px)); transform:none;
     max-width:calc(100% - 378px - 60px); flex-wrap:wrap; row-gap:2px; border-radius:14px}
   body.side-open #mineFloat::-webkit-scrollbar{display:none}
@@ -508,7 +536,10 @@ body.picking .leaflet-interactive{pointer-events:none!important}
 #card .ph .strip.multi .slide:last-child{scroll-snap-align:end}
 #card .ph .slide .bg{position:absolute; inset:-20px; background-size:cover; background-position:center;
   filter:blur(18px) brightness(.72) saturate(1.1)}
-#card .ph .slide img{position:relative; width:100%; height:100%; object-fit:contain; cursor:pointer}
+/* カードの写真は枠いっぱいに切り抜く。建物の上部が切れにくいよう、中央よりやや上を基準にする。
+   写真の全体表示（ぼかしの余白）は物件ページだけ */
+#card .ph .slide img{position:relative; width:100%; height:100%; object-fit:cover; object-position:50% 35%; cursor:pointer}
+#card .ph .slide .bg{display:none}
 #card .ph .slide .empty{position:absolute; inset:0; display:flex; align-items:center; justify-content:center}
 #card .ph .empty{color:var(--dim2); font-size:11px; letter-spacing:.1em}
 #card .nav{position:absolute; top:50%; transform:translateY(-50%);
@@ -751,11 +782,27 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 @media (max-width: 768px){
   :root{--sheet-h:35vh}
   #fBtn,#scrim,#fHead{display:none!important}
-  #topbar{height:46px; min-height:0; flex-wrap:nowrap; overflow-x:auto; gap:6px; padding:0 10px;
+  #topbar{height:44px; min-height:0; flex-wrap:nowrap; overflow:visible; gap:6px; padding:0 8px 0 14px;
     scrollbar-width:none}
   #topbar::-webkit-scrollbar{display:none}
-  #topbar .title,#topbar .count,#topbar .civil-link,#topbar .spacer{display:none}
-  #topbar .tbtn,#topbar .seg{flex:0 0 auto; white-space:nowrap}
+  #topbar .spacer{display:block}
+  #topbar a.brand.title{font-size:13.5px; flex-direction:column; gap:0; line-height:1.25}
+  #topbar a.brand .by{font-size:9.5px}
+  #searchSlotTop{display:none}
+  #menuBtn{display:block}
+  /* 「≡」で開くメニュー */
+  #menu{display:none; position:absolute; top:100%; right:6px; flex-direction:column; align-items:stretch; gap:0;
+    min-width:190px; padding:6px; background:var(--panel-solid); border:1px solid var(--line); border-radius:6px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  body.menu-open #menu{display:flex}
+  #menu .mitem{text-align:left; padding:11px 12px; font-size:14px}
+  #menu .civil-link{border:0}
+  /* 地図の上の検索窓と絞り込み */
+  #searchFloat{display:block; position:absolute; top:8px; left:8px; right:8px; z-index:1006}
+  #searchFloat #q{height:42px; border-radius:21px; padding:0 18px; font-size:16px; border:1px solid var(--line2);
+    box-shadow:0 2px 10px rgba(0,0,0,.18); background:var(--panel-solid)}
+  body #mineFloat{top:58px; left:8px; max-width:calc(100% - 16px)}
+  .leaflet-top{top:104px}
   #main{position:relative}
   #stage{position:absolute; inset:0}
 
@@ -806,11 +853,15 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 }
 </style>
 <script>
-/* 表示の種類（明るい／暗い）。選んだものはこのブラウザに覚えておく。既定は明るい表示（淡色地図） */
+/* 表示の種類（明るい／暗い）。最初は端末の設定（ダークモードかどうか）に合わせる。
+   メニューで切り替えたら、その選択をこのブラウザに覚えて優先する */
 (function(){
   var t = null;
   try { t = localStorage.getItem('bunkazai-theme'); } catch(e) {}
-  document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+  if(t !== 'dark' && t !== 'light'){
+    t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  document.documentElement.setAttribute('data-theme', t);
 })();
 </script>
 </head>
@@ -820,17 +871,20 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 <div id="app">
   <div id="topbar">
     <button id="fBtn" aria-controls="filters" aria-expanded="false">フィルタ<span class="n" id="fBtnN"></span></button>
-    <div class="seg">
-      <button id="mMap" class="on">地図</button><button id="mTile">写真タイル</button>
-    </div>
-    <div class="title">登録有形文化財（建造物）&nbsp;<b>全12分類</b></div>
+    <a class="brand title" href="./" id="brand" title="最初の画面に戻る">登録有形文化財マップ<span class="by">by ときやど</span></a>
     <span id="localTag" title="写真を含むため、手元での閲覧専用です">ローカル閲覧専用・再配布不可</span>
+    <div id="searchSlotTop"></div>
     <div class="spacer"></div>
-    <div class="count" id="topcount"></div>
-    <button class="tbtn" id="nearBtn">近くの文化財</button>
-    <button class="tbtn" id="zukanBtn" title="訪問した文化財の記録（この端末に保存）">図鑑<span class="n" id="zukanN"></span></button>
-    <button class="tbtn" id="themeBtn" title="昼間の屋外では明るい表示が見やすい">明るい表示</button>
-    <button class="tbtn" id="aboutBtn">データについて</button>
+    <!-- パソコンは項目を横に並べる。スマホは「≡」を押すと縦に開く -->
+    <nav id="menu" aria-label="メニュー">
+      <button type="button" class="mitem" id="introBtn">はじめに</button>
+      <button type="button" class="mitem" id="zukanBtn" title="訪問した文化財の記録（この端末に保存）">図鑑<span class="n" id="zukanN"></span></button>
+      <button type="button" class="mitem" id="tileBtn">写真タイル</button>
+      <button type="button" class="mitem" id="themeBtn">暗い表示</button>
+      <button type="button" class="mitem" id="aboutBtn">データについて</button>
+    </nav>
+    <button type="button" id="menuBtn" aria-controls="menu" aria-expanded="false" aria-label="メニュー">≡</button>
+    <span id="mMap" hidden></span><span id="mTile" hidden></span><span id="topcount" hidden></span>
   </div>
 
   <div id="main">
@@ -841,7 +895,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 
       <div class="grp">検索・地域・訪問状態</div>
 
-      <div class="fg">
+      <div class="fg" id="searchBox">
         <h3>場所・名称で探す</h3>
         <input type="text" id="q" placeholder="市町村名や名称（例: 尾鷲、旅館）" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg">
         <div class="sugg" id="sugg" role="listbox" hidden></div>
@@ -935,6 +989,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
     <div id="stage">
       <div id="map"></div>
       <canvas id="dots"></canvas>
+      <div id="searchFloat"></div>
       <div id="mineFloat" role="group" aria-label="絞り込み" hidden></div>
       <div id="yearOverlay" hidden><span class="y" id="ovY"></span><span class="w" id="ovW"></span></div>
       <div id="tiles"><div id="tilegrid"></div><div id="tilefoot"></div></div>
@@ -1014,7 +1069,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-05 11:09", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-05 12:08", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1462,6 +1517,26 @@ function initMap(){
   mcg.on('animationend', specialToFront);
   map.on('zoomend moveend', specialToFront);
 
+  // 現在地ボタン（◎）。押すと「近くの文化財」（現在地から近い順）。スマホは下のシートにその一覧を出す
+  const Loc = L.Control.extend({
+    options:{position:'bottomright'},
+    onAdd(){
+      const wrap=L.DomUtil.create('div','leaflet-bar');
+      const b=L.DomUtil.create('button','loc-btn',wrap);
+      b.type='button'; b.id='locBtn'; b.textContent='◎'; b.title='近くの文化財（現在地から近い順）'; b.setAttribute('aria-label', b.title);
+      L.DomEvent.disableClickPropagation(wrap);
+      b.onclick=()=>{
+        startNear();
+        if(MOBILE.matches){
+          const f=$('#filters'); SHEET.to(f,'mid');
+          setTimeout(()=>{ const nb=$('#nearBox'); if(nb) f.scrollTop = nb.offsetTop - 30; }, 300);
+        } else if(NARROW.matches) setFilterOpen(true);
+      };
+      return wrap;
+    }
+  });
+  new Loc().addTo(map);
+
   map.on('click', e=>{
     if(NEAR.picking){ setBase(e.latlng.lat, e.latlng.lng); return; }
     if(!e.originalEvent.target.closest('#card')) closeCard();
@@ -1477,7 +1552,7 @@ function initMap(){
    優先順: ハッシュの c/z → id の物件 → near の基点 → 日本全体 */
 const JP_BOUNDS = [[31.0,129.5],[45.6,145.8]];
 /* 日本の四島（北海道〜九州）。最初に開いたときにこれが画面いっぱいに収まるようにする */
-const JP_MAIN = [[30.95,129.55],[45.55,145.85]];
+const JP_MAIN = [[31.15,129.7],[45.45,145.6]];   // 北は宗谷岬、南は佐多岬、西は五島の手前、東は根室半島
 const VIEW_KEY = 'bunkazai-view';            // 前回見ていた位置（この端末のブラウザにだけ保存）
 function savedView(){
   try{ const v=JSON.parse(localStorage.getItem(VIEW_KEY)||'null');
@@ -1492,8 +1567,13 @@ function saveView(){
 function fitJapan(panelRight){
   let o;
   // スマホ: 最初は「ようこそ」が下半分に出るので、その上の範囲に収める（出ないときは検索のシートの分だけ除く）
-  if(MOBILE.matches) o = panelRight ? {paddingTopLeft:[8, 56], paddingBottomRight:[8, Math.round(window.innerHeight*0.5) + 8]} : fitPad(10);
-  else o = {paddingTopLeft:[12, 56], paddingBottomRight:[(panelRight ? 378 : 0) + 12, 12]};   // 上は絞り込みバーの分
+  // スマホ: 地図の上の検索窓と絞り込みの下から、下の「ようこそ」（画面の約35%）の上までに収める
+  if(MOBILE.matches){
+    const top = Math.round(($('#mineFloat').getBoundingClientRect().bottom || 0) - map.getContainer().getBoundingClientRect().top) + 6;
+    o = {paddingTopLeft:[8, Math.max(8, top)], paddingBottomRight:[8, Math.round(window.innerHeight*0.35) + 8]};
+  }
+  // 上下は詰める（絞り込みバーの下はロシア・日本海で、四島にはかからない）
+  else o = {paddingTopLeft:[8, 4], paddingBottomRight:[(panelRight ? 378 : 0) + 8, 4]};
   map.fitBounds(JP_MAIN, Object.assign(o, {animate:false}));
 }
 function initialView(H){
@@ -2203,6 +2283,27 @@ function fitVisible(){
 }
 
 /* F の値を各コントロールの見た目に反映（ハッシュから開いたとき用） */
+/* サイト名を押したとき: 最初の画面に戻る（カード・近くの文化財・絞り込み・検索を解除し、四島の範囲で「ようこそ」） */
+function goHome(){
+  closeCard();
+  if(ANIM.active) animStop({apply:false});
+  if(NEAR.base || NEAR.picking){ try{ clearNear(); }catch(_){} }
+  $('#placeList').hidden=true;
+  F.ymin=YMIN; F.ymax=YMAX; F.showNull=true;
+  F.cat=new Set(IDX.cats.map((_,i)=>i)); F.type=new Set(IDX.types.map((_,i)=>i));
+  F.src=new Set([0,1,2]); F.photo=new Set([0,1]);
+  F.pref=''; F.city=-1; F.q=''; F.qRaw=''; F.mine=0; F.live=0;
+  $('#sugg').hidden=true;
+  if(mode!=='map') setMode('map');
+  syncControls(); syncMineButtons();
+  applyFilters();
+  if(typeof showCityWhere==='function') showCityWhere();
+  if(MOBILE.matches && SHEET.state($('#filters'))) SHEET.to($('#filters'), 'mid');
+  showWelcome();
+  fitJapan(true);
+  writeHashNow();
+}
+
 function syncControls(){
   document.querySelectorAll('#catList .catrow').forEach(el=>el.classList.toggle('off', !F.cat.has(+el.dataset.v)));
   refreshTypeChips();
@@ -2409,11 +2510,21 @@ function buildUI(){
   };
 
   // 表示モード
-  $('#mMap').onclick=()=>setMode('map');
-  $('#mTile').onclick=()=>setMode('tile');
+  // メニュー（パソコンは横並び、スマホは「≡」で開く）
+  const closeMenu=()=>{ document.body.classList.remove('menu-open'); $('#menuBtn').setAttribute('aria-expanded','false'); };
+  $('#menuBtn').onclick=e=>{ e.stopPropagation(); const o=!document.body.classList.contains('menu-open');
+    document.body.classList.toggle('menu-open', o); $('#menuBtn').setAttribute('aria-expanded', o?'true':'false'); };
+  document.addEventListener('click', e=>{ if(!e.target.closest('#menu,#menuBtn')) closeMenu(); });
+  $('#menu').addEventListener('click', e=>{ if(e.target.closest('.mitem')) closeMenu(); });
+  $('#tileBtn').onclick=()=>setMode(mode==='tile' ? 'map' : 'tile');
+  // サイト名の横の「by ときやど」（pages_config.json の public_labels.owner）
+  const by=$('#brand .by'); if(by) by.textContent='by '+LBL.owner;
+  // 検索窓: パソコンはヘッダーの中、スマホは地図の上に浮かせる（左の列・下のシートから移す）
+  placeSearch();
+  MOBILE.addEventListener('change', placeSearch);
 
   // 近くの文化財
-  $('#nearBtn').onclick=startNear;
+  // 「近くの文化財」は地図の右下の現在地ボタン（◎）から
   $('#nearPick').onclick=()=>enterPick('');
   $('#nearClear').onclick=clearNear;
 
@@ -2427,8 +2538,9 @@ function buildUI(){
     location.reload();
   };
   // 上部バーの題名を押すと「ようこそ」（最近撮った文化財など）をもう一度出す
-  document.querySelector('#topbar .title').title=ADMIN ? '最近撮った文化財などを表示' : LBL.recent_title+'などを表示';
-  document.querySelector('#topbar .title').onclick=()=>{ closeCard(); showWelcome(); };
+  document.querySelector('#topbar .title').title='最初の画面に戻る';
+  document.querySelector('#topbar .title').onclick=e=>{ e.preventDefault(); goHome(); };
+  $('#introBtn').onclick=()=>{ closeCard(); showWelcome(); };
   $('#aboutClose').onclick=closeAbout;
   $('#about').onclick=e=>{ if(e.target.id==='about') closeAbout(); };
   // 図鑑（訪問の記録）
@@ -2454,10 +2566,10 @@ function buildUI(){
   // スマホ: ボトムシート
   SHEET.register($('#filters'), ['min','mid','max'], null);
   SHEET.register($('#card'), ['mid','max'], ()=>closeCard());
-  SHEET.register($('#welcome'), ['mid','max'], ()=>{ $('#welcome').hidden=true; });
+  SHEET.register($('#welcome'), ['low','mid','max'], ()=>{ $('#welcome').hidden=true; });
   SHEET.register($('#placeList'), ['mid','max'], ()=>{ $('#placeList').hidden=true; });
   SHEET.watchShown($('#card'));
-  SHEET.watchShown($('#welcome'));
+  SHEET.watchShown($('#welcome'), 'low');
   SHEET.watchShown($('#placeList'));
   SHEET.init();
   // スマホ幅⇔パソコン幅の切り替え（change が来ない環境もあるので resize でも確かめる）
@@ -2469,11 +2581,13 @@ function buildUI(){
   MOBILE.addEventListener('change', onWidth);
   window.addEventListener('resize', ()=>{ clearTimeout(rsz); rsz=setTimeout(onWidth, 120); });
   // 検索欄に入ったら候補が見えるように全体まで引き上げる
-  $('#q').addEventListener('focus', ()=>{ if(MOBILE.matches) SHEET.to($('#filters'), 'max'); });
+  // 検索窓はシートの外にあるので、入力中はシートを下げて候補を見やすく
+  $('#q').addEventListener('focus', ()=>{ if(MOBILE.matches && SHEET.state($('#filters'))==='max') SHEET.to($('#filters'), 'mid'); });
   // 地図を動かし始めたら、最大化している検索・絞り込みのシートは中間まで下げて地図を見せる
   map.on('dragstart', ()=>{ if(MOBILE.matches && SHEET.state($('#filters'))==='max') SHEET.to($('#filters'), 'mid'); });
 
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && document.body.classList.contains('menu-open')){ document.body.classList.remove('menu-open'); return; }
     if(e.key==='Escape'){
       if(!$('#about').hidden){ closeAbout(); return; }
       if(!$('#zukan').hidden){ closeZukan(); return; }
@@ -2502,6 +2616,12 @@ function syncMineButtons(){
   });
 }
 
+/* 検索窓の置き場所: パソコンはヘッダーの中、スマホは地図の上に浮かせる */
+function placeSearch(){
+  const box=$('#searchBox'); if(!box) return;
+  const to = MOBILE.matches ? $('#searchFloat') : $('#searchSlotTop');
+  if(to && box.parentNode!==to) to.appendChild(box);
+}
 /* 右のパネル（物件カード・ようこそ）が出ているか。絞り込みバーの位置に使う */
 function syncSideOpen(){
   const c=$('#card'), w=$('#welcome');
@@ -2551,10 +2671,13 @@ const SHEET = (()=>{
   function px(el, name){
     const isF = el.id==='filters';
     if(name==='min') return Math.round(Math.max(60, Math.min(96, below(el, el.querySelector('.summary')) + 6)));
+    // low: 「ようこそ」を初めて出す高さ。検索・絞り込みのシートの中間（画面の約35%）と同じにそろえ、
+    // 地図と右下の現在地ボタン（◎）が最初から見えるようにする
+    if(name==='low') return px($('#filters'), 'mid');
     if(name==='mid'){
       if(!isF) return Math.round(vh()*0.5);
       // 画面の35%。ただし検索欄が必ず見えるように（小さな画面では40%まで広げる）
-      const need = below(el, $('#q')) + 14;
+      const need = 0;   // 検索窓はシートの外（地図の上）に移した
       return Math.round(Math.min(Math.max(vh()*0.35, need), Math.max(vh()*0.40, vh()*0.35)));
     }
     return Math.round(Math.min(vh()*0.85, topLimit()));
@@ -2618,7 +2741,7 @@ const SHEET = (()=>{
       const sn=c().snaps, cur=state.get(el);
       if(!s0.decided){
         // タップ: 最小化→中間、中間→最大化、最大化→中間（つまみの上、または最小化中のどこか）
-        if(s0.handle) apply(el, cur==='min' ? 'mid' : cur==='mid' && sn.includes('max') ? 'max' : 'mid', true);
+        if(s0.handle) apply(el, (cur==='min' || cur==='low') ? 'mid' : cur==='mid' && sn.includes('max') ? 'max' : (sn.includes('low') ? 'low' : 'mid'), true);
         return;
       }
       if(!s0.drag) return;
@@ -2657,12 +2780,12 @@ const SHEET = (()=>{
     });
   }
   // 表示されたシートは中間から始める（開き直すたびに）
-  function watchShown(el){
+  function watchShown(el, first){
     const isShown=()=>!el.hidden && !el.classList.contains('hidden');
     let was=isShown();
     new MutationObserver(()=>{
       const now=isShown();
-      if(now && !was) to(el, 'mid');
+      if(now && !was) to(el, first || 'mid');
       was=now;
     }).observe(el, {attributes:true, attributeFilter:['hidden','class']});
   }
@@ -2673,7 +2796,7 @@ const SHEET = (()=>{
   function init(){
     if(!MOBILE.matches){ reset(); return; }
     document.body.classList.remove('fopen');
-    for(const [el] of conf){ if(!state.get(el) && (el.id==='filters' || (!el.hidden && !el.classList.contains('hidden')))) to(el, 'mid'); }
+    for(const [el] of conf){ if(!state.get(el) && (el.id==='filters' || (!el.hidden && !el.classList.contains('hidden')))) to(el, el.id==='welcome' ? 'low' : 'mid'); }
   }
   return {register, watchShown, to, init, refresh, state:el=>state.get(el), px};
 })();
@@ -2691,6 +2814,7 @@ function setMode(m){
   document.body.classList.toggle('tilemode', mode==='tile');
   $('#mMap').classList.toggle('on', mode==='map');
   $('#mTile').classList.toggle('on', mode==='tile');
+  $('#tileBtn').textContent = mode==='tile' ? '地図に戻る' : '写真タイル';
   if(!booted) return;   // 起動時は直後の applyFilters が描く
   if(mode==='tile') renderTiles();
   else { mcg.clearLayers(); mcg.addLayers(lastVisible.map(i=>markers[i]).filter(Boolean)); }
@@ -2873,7 +2997,7 @@ function setBase(la, ln, opts){
       interactive:false, keyboard:false, zIndexOffset:1000
     }).addTo(map);
   } else NEAR.marker.setLatLng([la,ln]);
-  $('#nearBtn').classList.add('on');
+  const lb=$('#locBtn'); if(lb) lb.classList.add('on');
   $('#nearBox').hidden=false;
   const top=renderNear();
   if(o.move){
@@ -2888,7 +3012,7 @@ function setBase(la, ln, opts){
 function clearNear(){
   if(NEAR.marker){ NEAR.marker.remove(); NEAR.marker=null; }
   NEAR.base=null; NEAR.picking=false; document.body.classList.remove('picking');
-  $('#nearBtn').classList.remove('on');
+  { const lb=$('#locBtn'); if(lb) lb.classList.remove('on'); }
   $('#nearBox').hidden=true; $('#nearList').innerHTML='';
   scheduleHash();
 }
