@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bunkazai.tokiyado.net/sitemap.xml

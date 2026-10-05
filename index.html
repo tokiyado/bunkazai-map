@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 05:36） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 08:58） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -931,6 +931,9 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
     <p>文化庁「国指定文化財等データベース」<br>
       <a href="https://kunishitei.bunka.go.jp/" target="_blank" rel="noopener">https://kunishitei.bunka.go.jp/</a></p>
 
+    <h3>物件ごとのページ</h3>
+    <p>1物件1ページの静的なページもあります（写真・メモ・近くの文化財つき）。<br>
+      <a href="pref/">都道府県別の一覧</a></p>
 
     <h3>取得日・件数</h3>
     <dl id="aboutFacts"></dl>
@@ -975,14 +978,14 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-05 05:36", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-05 08:58", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
        "local" = 写真入りのローカル閲覧専用（img/ を同梱。再配布不可） */
 const DIST = "site";
 const PAGES_BASE = "";   // 物件ページの置き場所（公開版は "" = 同じサイト内。それ以外は公開URL）
-const PAGES_ON = false;
+const PAGES_ON = true;
 /* 自分の写真の並び（表紙が先頭）。content/{ID}.md の cover / photos から build_html.py が作る。
    {物件ID: ["2023-10-07_140920.jpeg", …]}（撮影日_ファイル名） */
 const PHOTO_ORDER = {"00009682":["2023-10-07_140806.jpeg","2023-10-07_140920.jpeg","2023-10-07_140902.jpeg"]};

@@ -1,0 +1,216 @@
+/* 物件ページ・一覧ページ共通（build_pages.py が assets/page.css にコピーする）
+   地図（bunkazai_all_map.html）の明るい表示と同じ色づかい。端末が暗い表示なら暗くする。JS は使わない */
+:root{
+  --bg:#F4F4F2; --panel:#FFFFFF; --fg:#141416; --fg2:#26262B; --dim:#4A4A52; --dim2:#62626B;
+  --line:#D4D4DA; --line2:#A9A9B2; --hover:#EEEEF1; --tile:#EFEFF1; --sel:#141416; --sel-ink:#FFFFFF;
+  --map-filter:grayscale(.55) contrast(.96);
+  --c0:#18a3bb; --c1:#024914; --c2:#16497c; --c3:#ba8c0c; --c4:#c17fac; --c5:#714ccd;
+  --c6:#2aaa4c; --c7:#841b59; --c8:#067a5f; --c9:#854c17; --c10:#d43a4d; --c11:#7a89fe;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0B0B0C; --panel:#131316; --fg:#F2F2F2; --fg2:#E2E2E6; --dim:#B8B8BE; --dim2:#9A9AA2;
+    --line:#2E2E33; --line2:#4A4A52; --hover:#1D1D22; --tile:#111113; --sel:#E6E6E6; --sel-ink:#0B0B0C;
+    --map-filter:invert(1) hue-rotate(180deg) grayscale(.75) brightness(.82) contrast(.92);
+    --c0:#00defc; --c1:#157e36; --c2:#1074a6; --c3:#9b8e02; --c4:#feadcb; --c5:#8c69dd;
+    --c6:#76d27d; --c7:#b13a7f; --c8:#02aaa5; --c9:#f9a600; --c10:#ec697b; --c11:#93a8fe;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--fg);
+  font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;
+  font-size:15px; line-height:1.8; -webkit-font-smoothing:antialiased}
+a{color:var(--fg); text-decoration:none; border-bottom:1px solid var(--line2)}
+a:hover{border-bottom-color:var(--fg)}
+h1,h2,h3{font-weight:500; line-height:1.4; margin:0}
+
+.top{border-bottom:1px solid var(--line); background:var(--panel)}
+.top .in{max-width:880px; margin:0 auto; padding:10px 16px; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px}
+.top .site{font-size:13px; letter-spacing:.12em; border:0; color:var(--fg)}
+.crumbs{font-size:12px; color:var(--dim); display:flex; flex-wrap:wrap; gap:2px 6px; list-style:none; margin:0; padding:0}
+.crumbs li+li::before{content:"›"; margin-right:6px; color:var(--dim2)}
+.crumbs a{color:var(--dim); border:0}
+.crumbs a:hover{color:var(--fg)}
+
+main{max-width:880px; margin:0 auto; padding:20px 16px 48px}
+section{margin-top:34px}
+section > h2{font-size:13px; letter-spacing:.14em; color:var(--dim); padding-bottom:7px; border-bottom:1px solid var(--line); margin-bottom:14px}
+
+/* 写真 */
+.photos{margin:0 0 22px}
+/* 横に並べてスワイプ。写真は切らずに全体を見せ、余白には同じ写真をぼかして敷く */
+.gallery{display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
+  scrollbar-width:thin; border-radius:3px}
+/* 枠の比率 = 表紙の写真の比率（--ar。横長は 16:9、縦長は 4:5 まで）。高さは画面の72%まで */
+.gallery{justify-content:safe center}
+.gallery .slide{position:relative; flex:0 0 min(100%, calc(72vh * var(--ar, 1.333))); aspect-ratio:var(--ar, 1.333);
+  margin:0; overflow:hidden; scroll-snap-align:start; border-radius:3px; background:var(--tile)}
+.gallery.multi{justify-content:flex-start}
+.gallery.multi .slide{flex-basis:min(88%, calc(72vh * var(--ar, 1.333)))}   /* 次の写真の端が見える */
+.gallery.multi .slide:last-child{scroll-snap-align:end}
+.gallery .bg{position:absolute; inset:-24px; background-size:cover; background-position:center;
+  filter:blur(22px) brightness(.72) saturate(1.1)}
+.gallery img{position:relative; display:block; width:100%; height:100%; object-fit:contain}
+.gallery figcaption{position:absolute; right:8px; bottom:8px; font-size:11px; letter-spacing:.08em;
+  color:#fff; background:rgba(0,0,0,.5); padding:1px 7px; border-radius:2px}
+.phint{font-size:12px; color:var(--dim2); margin:6px 0 0}
+
+
+/* 見出しまわり */
+.cat{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--dim)}
+.sw{display:inline-block; width:9px; height:9px; border-radius:50%; flex:0 0 9px; background:var(--dim2)}
+h1.name{font-size:26px; margin-top:6px; letter-spacing:.02em}
+.kana{font-size:13px; color:var(--dim); margin-top:2px}
+.variant{font-size:13px; color:var(--fg2); margin-top:6px}
+.variant b{font-weight:500}
+.src{font-size:12px; color:var(--dim); margin-top:12px}
+.lead{font-size:14px; color:var(--fg2); margin-top:12px}
+
+/* 基本データ */
+table.facts{width:100%; border-collapse:collapse; font-size:14px}
+table.facts th{width:7.5em; text-align:left; vertical-align:top; font-weight:400; color:var(--dim); padding:7px 12px 7px 0; border-bottom:1px solid var(--line); white-space:nowrap}
+table.facts td{padding:7px 0; border-bottom:1px solid var(--line); color:var(--fg2)}
+.tag{display:inline-block; font-size:11px; letter-spacing:.06em; color:var(--dim); border:1px solid var(--line2); border-radius:2px; padding:0 5px; margin-left:6px; vertical-align:1px}
+.note{font-size:12px; color:var(--dim2); margin-top:8px}
+
+/* 文化庁の解説（引用） */
+blockquote.quote{margin:16px 0 0; padding:12px 16px; border-left:3px solid var(--line2); background:var(--panel); border-radius:0 3px 3px 0; color:var(--fg2)}
+blockquote.quote p{margin:0}
+blockquote.quote footer{font-size:12px; color:var(--dim); margin-top:8px}
+
+/* 独自コンテンツ */
+.prose p{margin:0 0 12px}
+.prose ul{margin:0 0 12px; padding-left:1.3em}
+.visit{display:inline-block; font-size:13px; padding:3px 10px; border-radius:3px; background:var(--sel); color:var(--sel-ink); margin-bottom:10px}
+
+/* 位置（地理院タイルを並べた静的な地図。JS なし） */
+.smap{position:relative; height:260px; overflow:hidden; border-radius:3px; border:1px solid var(--line); background:var(--tile)}
+.smap .tiles{position:absolute; width:1280px; height:768px; display:grid; grid-template-columns:repeat(5,256px); filter:var(--map-filter)}
+.smap .tiles img{display:block; width:256px; height:256px}
+/* 物件の位置: しずく型のピン（分類色・白縁・下向きの影）。先端が枠の真ん中（＝物件の座標）を指す。
+   上に物件名のラベル。どちらも地図タイルより手前 */
+.smap .mark{position:absolute; left:50%; top:50%; z-index:2; width:0; height:0}
+.smap .pin{position:absolute; left:-14px; top:-38px; width:28px; height:40px; overflow:visible;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.35))}
+.smap .plabel{position:absolute; left:0; bottom:44px; transform:translateX(-50%);
+  max-width:min(260px, 70vw); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  padding:2px 8px; border-radius:4px; background:#fff; color:#141416; font-size:12px; line-height:1.6;
+  box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.smap .attr{position:absolute; right:0; bottom:0; font-size:10px; padding:1px 6px; background:rgba(255,255,255,.85); color:#333}
+.smap .attr a{color:#333; border:0}
+.maplinks{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.btn{display:inline-block; font-size:13px; padding:7px 14px; border:1px solid var(--line2); border-radius:3px; color:var(--fg2)}
+.btn:hover{background:var(--hover); color:var(--fg)}
+.btn.primary{background:var(--sel); color:var(--sel-ink); border-color:var(--sel)}
+.coords{font-size:12px; color:var(--dim2); margin-top:6px; font-variant-numeric:tabular-nums}
+
+/* 近くの文化財・一覧 */
+ul.plist{list-style:none; margin:0; padding:0}
+ul.plist li{display:flex; align-items:baseline; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px}
+ul.plist li .sw{align-self:center}
+ul.plist li a{border:0; color:var(--fg)}
+ul.plist li a:hover{text-decoration:underline}
+ul.plist li .m{margin-left:auto; font-size:12px; color:var(--dim); white-space:nowrap; font-variant-numeric:tabular-nums; padding-left:8px}
+h3.sub{font-size:13px; color:var(--dim); margin:18px 0 6px}
+
+/* 一覧ページ */
+.counts{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:4px 18px; font-size:13px}
+.counts div{display:flex; align-items:center; gap:7px; color:var(--fg2)}
+.counts .n{margin-left:auto; color:var(--dim); font-variant-numeric:tabular-nums}
+ul.munis{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:2px 18px}
+ul.munis li{display:flex; align-items:baseline; gap:6px; padding:5px 0; border-bottom:1px solid var(--line); font-size:14px}
+ul.munis li a{border:0}
+ul.munis li .n{margin-left:auto; font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums}
+ul.munis li.ward{padding-left:1em; font-size:13px}
+.region h3{font-size:13px; color:var(--dim); margin:16px 0 4px}
+
+.en{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+footer.site{border-top:1px solid var(--line); margin-top:40px}
+footer.site .in{max-width:880px; margin:0 auto; padding:16px 16px 32px; font-size:12px; color:var(--dim); line-height:1.9}
+footer.site a{color:var(--dim)}
+@media (max-width: 560px){
+  body{font-size:14px}
+  h1.name{font-size:22px}
+  table.facts th{width:6em}
+}
+
+/* 英語の入口（名前のすぐ下）。押すとページの最後の英語の概要へ飛ぶ */
+html{scroll-behavior:smooth}
+.enlink{display:flex; align-items:baseline; gap:10px; margin-top:10px; font-size:13px; line-height:1.6}
+.enlink a{flex:0 0 auto; padding:2px 12px; border:1px solid var(--line2); border-radius:14px; color:var(--fg); font-weight:500}
+.enlink a:hover{background:var(--hover)}
+.enlink .tz{min-width:0; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+section.en{scroll-margin-top:12px}
+.totop{font-size:12px; margin-top:10px}
+.totop a{color:var(--dim)}
+@media (max-width: 560px){
+  /* スマホは英文の書き出しをボタンの下に2行まで */
+  .enlink{flex-direction:column; align-items:flex-start; gap:4px}
+  .enlink .tz{white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+}
+
+/* 今も使われている文化財（営業中）。アクセント色（pages_config.json の living_accent。build_pages.py が #FFB800 に入れる）は
+   線・光・小さな点にだけ使い、面は塗らない */
+:root{--accent:#FFB800}
+.livebadge{display:flex; align-items:center; gap:8px; margin:12px 0 0; font-size:14px; color:var(--fg)}
+.livebadge .dot, .living .dot{display:inline-block; width:8px; height:8px; border-radius:50%; flex:0 0 8px;
+  background:var(--accent); box-shadow:0 0 6px var(--accent)}
+.livebadge .lv, .living .lv{margin-left:6px; font-size:12px; color:var(--dim2)}
+.living .dot{margin-right:6px; vertical-align:1px}
+.linkbtns{margin:12px 0 0}
+.linkbtns .btn{padding:9px 18px; font-size:14px}
+.livenote{font-size:12px; color:var(--dim2); margin:6px 0 0}
+/* 位置の地図の営業中のピンは live_pin.css（build_pages.py がこのファイルの後ろに付ける） */
+
+/* 今入れる文化財（営業中）のピン。地図アプリ（build_html.py が差し込む）と物件ページの位置の地図（build_pages.py が
+   page.css の後ろに付ける）で共通。CSS だけで動かす（ぼかし・回転は使わない）。
+   形:  .lpin（先端＝座標が原点）
+          .lp-ripple  根元から広がる細い金色の楕円の輪（線だけ）
+          .lp-shadow  根元の小さな楕円の影
+          .lp-body    しずく（分類色の塗り・縁はアクセント色の細い線）
+          .plabel     名前のラベル（任意）
+   動き: 1. バウンス  少し上から落ちて2回小さく弾んで止まる（0.75秒）。影は弾みに合わせて伸び縮み
+         2. 波紋      着地後、根元から輪が広がりながら薄くなって消える（3.5秒周期で繰り返す）
+         視差効果を減らす設定では、バウンスと波紋を止め、静止した輪1本だけ */
+.lpin{position:absolute; left:0; top:0; width:0; height:0}
+.lpin .lp-body{position:absolute; left:-14px; top:-38px; width:28px; height:40px; transform-origin:14px 38px;
+  animation:lpDrop .75s linear both}
+.lpin .lp-body svg{display:block; width:28px; height:40px; overflow:visible}
+.lpin .lp-shadow{position:absolute; left:-9px; top:-3px; width:18px; height:6px; border-radius:50%;
+  background:rgba(30,30,36,.34); animation:lpShadow .75s linear both}
+.lpin .lp-ripple{position:absolute; left:0; top:0; width:8px; height:3px; box-sizing:border-box;
+  border:2px solid var(--accent); border-radius:50%; transform:translate(-50%,-50%); opacity:0;
+  animation:lpRipple 3.5s cubic-bezier(.2,.6,.4,1) .75s infinite}
+.lpin .plabel{position:absolute; left:0; bottom:44px; transform:translateX(-50%);
+  max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  padding:1px 8px; border-radius:4px; background:#fff; color:#141416; font-size:12px; line-height:18px;
+  box-shadow:0 1px 4px rgba(0,0,0,.3); animation:lpFade .3s ease-out .45s both}
+@keyframes lpDrop{
+  0%  {transform:translateY(-30px); opacity:0; animation-timing-function:cubic-bezier(.55,0,1,.45)}
+  12% {opacity:1}
+  40% {transform:translateY(0) scale(1.1,.86); animation-timing-function:cubic-bezier(0,.55,.45,1)}
+  58% {transform:translateY(-9px) scale(.97,1.04); animation-timing-function:cubic-bezier(.55,0,1,.45)}
+  74% {transform:translateY(0) scale(1.05,.93); animation-timing-function:cubic-bezier(0,.55,.45,1)}
+  87% {transform:translateY(-2px) scale(1)}
+  100%{transform:translateY(0) scale(1); opacity:1}
+}
+@keyframes lpShadow{
+  0%  {transform:scale(.3); opacity:.2}
+  40% {transform:scale(1.2,1.1); opacity:1}
+  58% {transform:scale(.72); opacity:.6}
+  74% {transform:scale(1.08); opacity:.95}
+  87% {transform:scale(.95)}
+  100%{transform:scale(1); opacity:1}
+}
+@keyframes lpRipple{
+  0%  {width:8px; height:3px; opacity:1}
+  50% {width:50px; height:16px; opacity:.8}
+  85% {width:68px; height:22px; opacity:0}
+  100%{width:68px; height:22px; opacity:0}
+}
+@keyframes lpFade{from{opacity:0} to{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  .lpin .lp-body, .lpin .lp-shadow, .lpin .plabel{animation:none}
+  .lpin .lp-ripple{animation:none; opacity:.9; width:34px; height:11px}
+}
