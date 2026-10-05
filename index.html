@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 08:58） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 10:03） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -14,6 +14,7 @@
 <meta property="og:url" content="https://bunkazai.tokiyado.net/">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary">
+<script>(function(){if(location.hostname!=='bunkazai.tokiyado.net')return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('js',new Date());gtag('config','G-W8EHXMSRNE');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-W8EHXMSRNE';document.head.appendChild(s);})();</script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
@@ -277,7 +278,11 @@ select:focus{border-color:var(--line2)}
 .covrow .v{font-size:11px; color:var(--dim2); font-variant-numeric:tabular-nums}
 /* 撮影の目安 */
 #card .shot{margin-top:12px; border-top:1px solid var(--line); padding-top:10px}
-#card .shot .t{display:flex; align-items:baseline; gap:8px; font-size:10px; letter-spacing:.1em; color:var(--dim2); margin-bottom:5px}
+#card .shot .t{display:flex; align-items:baseline; gap:8px; font-size:11px; letter-spacing:.1em; color:var(--dim); cursor:pointer; list-style:none}
+#card .shot .t::-webkit-details-marker{display:none}
+#card .shot .t::before{content:'＋'; color:var(--dim2)}
+#card .shot[open] .t::before{content:'－'}
+#card .shot[open] .t{margin-bottom:6px}
 #card .shot .st{margin-left:auto; letter-spacing:.04em; font-size:10px; color:var(--dim); border:1px solid var(--line2); border-radius:2px; padding:0 5px}
 #card .shot .st.ok{color:var(--sel-ink); background:var(--sel); border-color:var(--sel)}
 #card .shot ul{margin:0; padding-left:1.15em; font-size:12px; color:var(--fg2); line-height:1.75}
@@ -306,7 +311,7 @@ select:focus{border-color:var(--line2)}
 /* ---- 今も使われている文化財（営業中） ----
    アクセント色（--accent。pages_config.json の living_accent）は、ピンの縁・光と小さな点にだけ使う。面は塗らない */
 :root{--accent:#FFB800}
-#card .live{margin:0 0 12px}
+#card .live{margin:0 0 10px}
 #card .livebadge{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--fg); line-height:1.6}
 #card .livebadge .dot, #mineFloat button.live .dot{width:8px; height:8px; border-radius:50%; flex:0 0 8px;
   background:var(--accent); box-shadow:0 0 6px var(--accent)}
@@ -314,7 +319,9 @@ select:focus{border-color:var(--line2)}
 #card .livebtn{display:inline-block; margin-top:8px; padding:6px 14px; border:1px solid var(--line2); border-radius:3px;
   color:var(--fg); font-size:12.5px; text-decoration:none; background:transparent}
 #card .livebtn:hover{background:var(--hover2)}
-#card .livenote{margin-top:5px; font-size:11px; color:var(--dim2)}
+#card .livelink{display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:-4px 0 12px}
+#card .livelink .livebtn{margin-top:0}
+#card .livenote{font-size:11px; color:var(--dim2)}
 /* 英語の概要（英語がある物件だけ）。物件ページの English ボタンと同じ控えめな見た目で、カードの中で開閉する */
 #card .en{margin:0 0 10px}
 #card .enbtn{padding:1px 10px; border:1px solid var(--line2); border-radius:12px; background:transparent;
@@ -525,7 +532,22 @@ body.picking .leaflet-interactive{pointer-events:none!important}
 #card .desc.clamp{display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden}
 #card .desc .hint{color:var(--dim2); font-size:10px; letter-spacing:.1em}
 #card .copy{margin-top:8px; text-align:center}
-#card .pagelink{display:block; margin-top:14px; text-align:center; text-decoration:none; color:var(--fg2)}
+#card .pagelink{display:block; margin-top:8px; text-align:center; text-decoration:none; color:var(--fg2)}
+/* 物件ページへの導線 */
+#card h2 a.pname{color:var(--fg); text-decoration:none; border-bottom:1px solid var(--line2)}
+#card h2 a.pname:hover{border-bottom-color:var(--fg)}
+#card .morebtn{display:block; margin:2px 0 12px; padding:10px 12px; border-radius:3px; text-align:center; text-decoration:none;
+  background:var(--sel); color:var(--sel-ink); font-size:13.5px; font-weight:600; letter-spacing:.06em; border:0}
+#card .morebtn:hover{opacity:.9}
+#card .meta{font-size:12px; color:var(--fg2); line-height:1.7; margin:0 0 8px}
+#card .meta .dot{color:var(--dim2); margin:0 2px}
+#card .meta .maplink{margin-left:8px}
+#card .desc2{font-size:12px; color:var(--fg2); line-height:1.75;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+#card .readmore{display:inline-block; margin:3px 0 12px; font-size:12px; color:var(--fg); text-decoration:none; border-bottom:1px solid var(--line2)}
+#card .share{display:flex; gap:6px; margin-top:14px; border-top:1px solid var(--line); padding-top:12px}
+#card .share .linkbtn{flex:1 1 0; width:auto; margin:0; text-align:center; text-decoration:none}
+#card .legacy{margin-top:10px}
 /* SNS（X・Instagram） */
 #card .sns{margin-top:14px; border-top:1px solid var(--line); padding-top:11px}
 #card .sns .t{font-size:10px; letter-spacing:.1em; color:var(--dim2); margin-bottom:6px}
@@ -754,8 +776,11 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
   #filters .summary{margin-top:0}
   #card .close{top:30px; right:10px; background:rgba(0,0,0,.45); color:#fff; border-radius:50%; width:30px; height:30px}
   #welcome .x{top:30px}
+  /* 「詳しく見る」は、シートが半分のときも見えるよう下端に貼り付ける（本来の位置まで来たらそこに戻る） */
+  #card .morebtn{position:sticky; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:5;
+    box-shadow:0 4px 14px rgba(0,0,0,.28), 0 0 0 4px var(--panel-solid)}
   /* 半分の高さでも名前まで見えるように、写真は低めに */
-  #card .ph{aspect-ratio:auto; height:min(56vw, 28vh)}
+  #card .ph{aspect-ratio:auto; height:max(100px, min(56vw, 24vh, calc(50vh - 190px)))}
   /* 地図の出典・拡大縮小のボタン・お知らせはシートに隠れないように持ち上げる */
   .leaflet-bottom{bottom:var(--sheet-h); transition:bottom .26s cubic-bezier(.2,.8,.2,1)}
   #toast{bottom:calc(var(--sheet-h) + 14px)}
@@ -934,6 +959,8 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
     <h3>物件ごとのページ</h3>
     <p>1物件1ページの静的なページもあります（写真・メモ・近くの文化財つき）。<br>
       <a href="pref/">都道府県別の一覧</a></p>
+    <h3>アクセス解析</h3>
+    <p>アクセス解析に Google アナリティクスを使っています（Cookie を使い、ページの閲覧やリンクのクリックを個人を特定しない形で集計します）。送信される情報と送信先は <a href="external/">外部送信について</a> をご覧ください。</p>
 
     <h3>取得日・件数</h3>
     <dl id="aboutFacts"></dl>
@@ -978,7 +1005,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-05 08:58", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-05 10:03", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -988,7 +1015,7 @@ const PAGES_BASE = "";   // 物件ページの置き場所（公開版は "" = �
 const PAGES_ON = true;
 /* 自分の写真の並び（表紙が先頭）。content/{ID}.md の cover / photos から build_html.py が作る。
    {物件ID: ["2023-10-07_140920.jpeg", …]}（撮影日_ファイル名） */
-const PHOTO_ORDER = {"00009682":["2023-10-07_140806.jpeg","2023-10-07_140920.jpeg","2023-10-07_140902.jpeg"]};
+const PHOTO_ORDER = {"00000773":["2023-08-24_142045.jpeg","2023-08-24_142051.jpeg"],"00009682":["2023-10-07_140806.jpeg","2023-10-07_140920.jpeg","2023-10-07_140902.jpeg"]};
 /* 今も使われている文化財（content/{ID}.md の living: true。自分で確認した物件だけ）。build_html.py が作る
    {label:"生きている文化財", filter:"今入れる文化財", items:{物件ID:{use, verified:"2026年9月確認", url, icon}}} */
 const LIVING = {"label":"生きている文化財","filter":"今入れる文化財","accent":"#FFB800","items":{"00009682":{"use":"カフェ","verified":"2026年9月確認","url":"https://cafe-asanisimasa.com/"}}};
@@ -2000,10 +2027,10 @@ function shotHtml(i){
   const done = MINE.byId[ids[i]] || [];
   const dates=[...new Set(done.map(p=>p.date))].sort();
   const status = done.length ? '撮影済み（'+dates.join('・')+'／'+done.length+'枚）' : '未撮影';
-  return '<div class="shot"><div class="t">撮影の目安<span class="st'+(done.length?' ok':'')+'">'+esc(status)+'</span></div>'
+  return '<details class="shot"><summary class="t">撮影の目安<span class="st'+(done.length?' ok':'')+'">'+esc(status)+'</span></summary>'
     + '<ul>'+shotsFor(i).map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>'
     + '<div class="mn">'+SHOT.manners.map(esc).join('<br>')+'</div>'
-    + '</div>';
+    + '</details>';
 }
 
 /* ================= 最初に開いたときのパネル ================= */
@@ -2971,6 +2998,10 @@ function openCard(i, opts){
   const wasOpen = !card.classList.contains('hidden');
   const catName = IDX.cats[cat[i]];
   if(NARROW.matches) setFilterOpen(false);   // ドロワー内の一覧から開いたときにカードが隠れないように
+  // アクセス解析: 地図で物件のカードを開いたときだけ「その物件を見た」を送る
+  // （#以降が変わるたびのページビューは数えない。GA4 側で「ブラウザの履歴イベントに基づくページの変更」をオフにしてある）
+  if(curId !== ids[i]) track('view_property', {property_id:ids[i], property_name:names[i], category:catName,
+    prefecture:(IDX.prefs[prf[i]]||''), transport_type:'xhr'});
   curId = ids[i];
   setSelected(i);
   $('#welcome').hidden=true;                 // カードを開いたら「ようこそ」は閉じる
@@ -3071,35 +3102,51 @@ function drawCard(r, ci){
   const tline = esc(r.type_guess||'')
     + (r.type_guess_confidence==='low' ? ' <span class="tag">推定</span>' : '');
 
+  // カードは「要点だけ」。解説の全文・基本データの表・SNS は物件ページに任せる（物件ページが無い版では従来どおりカードに出す）
+  const pageUrl = PAGES_ON ? PAGES_BASE+'p/'+r.id+'/' : '';
+  const tgt = PAGES_BASE ? ' target="_blank" rel="noopener"' : '';
+  const plink = (cls, ev, inner) => '<a class="'+cls+'" href="'+esc(pageUrl)+'"'+tgt+' data-ev="'+ev+'">'+inner+'</a>';
+  let ytxt;
+  if(r.year==null) ytxt='竣工年不明';
+  else if(r.year_source==='estimated') ytxt=(r.year_label || ((r.year_min!=null?r.year_min:r.year)+'〜'+(r.year_max!=null?r.year_max:r.year)+'年'))+'（推定）';
+  else ytxt=r.year+'年竣工';
+  const place = esc(r.address || r.pref || '');
   $('#card').innerHTML =
     '<div class="ph"></div>'
     +'<div class="credit">出典：文化庁 国指定文化財等データベース'
       +(r.url?'　<a href="'+esc(r.url)+'" target="_blank" rel="noopener">詳細ページ ↗</a>':'')+'</div>'
     +'<div class="body">'
+    // 1-2. 分類・名前（名前を押すと物件ページへ）
     +'<div class="catline"><span class="sw" style="background:'+CAT_COLORS[ci]+'"></span>'
       +esc(r.category)+(r.subcategory?'　'+esc(r.subcategory):'')+'</div>'
-    +'<h2>'+esc(r.name)+'</h2>'
+    +'<h2>'+(pageUrl ? plink('pname', 'card_name', esc(r.name)) : esc(r.name))+'</h2>'
     +(r.kana?'<div class="kana">'+esc(r.kana)+'</div>':'<div class="kana"></div>')
     + enHtml(r.id)
+    // 3. 営業中バッジ
     + liveHtml(r.id)
+    // 4. 詳しく見る
+    + (pageUrl ? plink('morebtn', 'card_detail', '詳しく見る →') : '')
+    + liveLinkHtml(r.id)
+    // 5. 竣工年・所在地
+    +'<div class="meta">'+esc(ytxt)+(place?'<span class="dot">・</span>'+place:'')
+      + (ci2>=0 && isFinite(lat[ci2]) ? '<a class="maplink" href="'+mapsUrl(ci2)+'" target="_blank" rel="noopener">地図アプリ ↗</a>' : '')+'</div>'
+    // 6. 解説の冒頭＋続きを読む
+    + (pageUrl && r.desc ? '<div class="desc2">'+esc(r.desc)+'</div>'+plink('readmore', 'card_readmore', '続きを読む →') : '')
+    // 7. 訪問した！
     +'<div class="visit" id="visitBox"></div>'
-    +row('年代', esc(r.era))
-    +row('竣工', yline)
-    +row('構造', esc(r.structure))
-    +row('材質', esc(r.structure_material))
-    +row('分類推定', tline)
-    +row('所在', esc(r.pref||'')+(r.address?'　'+esc(r.address):'')
-        + (ci2>=0 && isFinite(lat[ci2]) ? '<a class="maplink" href="'+mapsUrl(ci2)+'" target="_blank" rel="noopener">地図アプリ ↗</a>' : ''))
-    +row('登録', esc(r.registered))
-    +row('時代', esc(r.period))
-    +row('登録番号', esc(r.register_no))
-    +(r.desc?'<div class="desc clamp" id="desc">'+esc(r.desc)+' <span class="hint">［展開］</span></div>':'')
-    + mineHtml(r.id)
+    // 8. 撮影の目安（折りたたみ）
     + shotHtml(idxIndex(r.id))
     + sameSpotHtml(idxIndex(r.id))
-    + snsHtml(r)
-    +(PAGES_ON ? '<a class="linkbtn pagelink" href="'+esc(PAGES_BASE+'p/'+r.id+'/')+'"'+(PAGES_BASE?' target="_blank" rel="noopener"':'')+'>この物件のページを開く</a>' : '')
-    +'<button class="linkbtn copy" id="copyLink">このページのリンクをコピー</button>'
+    // 物件ページが無い版（手元の作業用など）は、詳しいデータもカードに出す
+    + (pageUrl ? '' : '<div class="legacy">'
+        +row('年代', esc(r.era))+row('竣工', yline)+row('構造', esc(r.structure))+row('材質', esc(r.structure_material))
+        +row('分類推定', tline)+row('登録', esc(r.registered))+row('時代', esc(r.period))+row('登録番号', esc(r.register_no))
+        +(r.desc?'<div class="desc clamp" id="desc">'+esc(r.desc)+' <span class="hint">［展開］</span></div>':'')
+        + mineHtml(r.id) + snsHtml(r) + '</div>')
+    // 共有（物件ページの URL）
+    +'<div class="share"><button type="button" class="linkbtn copy" id="copyLink">'+COPY_LABEL+'</button>'
+    +'<a class="linkbtn xshare" id="xShare" href="'+esc(xShareUrl(r))+'" target="_blank" rel="noopener">𝕏 でシェア</a></div>'
+    +(pageUrl ? plink('linkbtn pagelink', 'card_bottom', 'この物件のページを開く') : '')
     +'</div>';
   galBase = gal.length;          // ここから後ろに「訪問の写真」を足す
   drawSlide();
@@ -3107,9 +3154,13 @@ function drawCard(r, ci){
   const d=$('#desc'); if(d) d.onclick=()=>d.classList.toggle('clamp');
   const eb=$('#card .enbtn');
   if(eb) eb.onclick=()=>{ const t=$('#enText'); t.hidden=!t.hidden; eb.setAttribute('aria-expanded', t.hidden ? 'false' : 'true'); };
-  $('#copyLink').onclick=e=>copyLink(e.currentTarget);
-  // シェアの URL は押した時点の地図の位置も含めたいので、押したときに作り直す
+  $('#copyLink').onclick=e=>{ copyLink(e.currentTarget); track('share', {method:'copy_link', content_type:'property', item_id:r.id}); };
+  // シェアの URL は押した時点で作り直す（物件ページが無い版では、地図の位置も含めた地図の URL）
+  const xs=$('#xShare'); if(xs) xs.onclick=()=>{ xs.href=xShareUrl(r); track('share', {method:'x', content_type:'property', item_id:r.id}); };
   const sh=$('#snsShare'); if(sh) sh.onclick=()=>{ sh.href=xShareUrl(r); };
+  // 物件ページへ移った回数（どのリンクからか）を数える
+  $('#card').querySelectorAll('a[data-ev]').forEach(el=>el.addEventListener('click', ()=>
+    track('open_property_page', {property_id:r.id, link_location:el.dataset.ev})));
   $('#card').querySelectorAll('.same .row2').forEach(el=>el.onclick=()=>openCard(+el.dataset.i));
   $('#card').querySelectorAll('.mine .th').forEach(el=>el.onclick=()=>{ galI=+el.dataset.slot; drawSlide(); });
 }
@@ -3119,10 +3170,14 @@ function liveHtml(pid){
   const lv = LIVING.items[pid];
   if(!lv) return '';
   return '<div class="live" title="'+esc(LIVING.label)+'"><div class="livebadge"><span class="dot"></span>'
-    + '<span>営業中・'+esc(lv.use)+'</span><span class="lv">'+esc(lv.verified)+'</span></div>'
-    + (lv.url ? '<a class="livebtn" href="'+esc(lv.url)+'" target="_blank" rel="noopener">公式サイト ↗</a>'
-              + '<div class="livenote">営業日は公式サイトでご確認ください</div>' : '')
-    + '</div>';
+    + '<span>営業中・'+esc(lv.use)+'</span><span class="lv">'+esc(lv.verified)+'</span></div></div>';
+}
+/* 営業中の物件の公式サイト（「詳しく見る」の下に置く） */
+function liveLinkHtml(pid){
+  const lv = LIVING.items[pid];
+  if(!lv || !lv.url) return '';
+  return '<div class="livelink"><a class="livebtn" href="'+esc(lv.url)+'" target="_blank" rel="noopener">公式サイト ↗</a>'
+    + '<span class="livenote">営業日は公式サイトでご確認ください</span></div>';
 }
 /* カードの英語の概要（英語がある物件だけ）。「English」を押すとカードの中で開閉する */
 function enHtml(pid){
@@ -3459,9 +3514,18 @@ function shareablePageUrl(){
   const local = location.protocol==='file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   return local ? PUBLIC_URL + h : location.href;
 }
+/* 共有する URL。物件ページを公開している版では物件ページ（https://bunkazai.tokiyado.net/p/{ID}/）、
+   そうでなければ地図の URL */
+function shareUrlOf(id){ return PAGES_ON ? PUBLIC_URL+'p/'+id+'/' : shareablePageUrl(); }
 function xShareUrl(r){
   const text='【'+r.name+'】をチェックしました！ #登録有形文化財 #文化財Go';
-  return 'https://x.com/intent/post?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareablePageUrl());
+  return 'https://x.com/intent/post?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrlOf(r.id));
+}
+const COPY_LABEL = PAGES_ON ? 'この物件のリンクをコピー' : 'このページのリンクをコピー';
+/* アクセス解析（GA4）のイベント。測定IDが設定されていない版では何もしない。
+   ページを移るリンクでも取りこぼさないよう beacon で送る */
+function track(name, params){
+  try{ if(typeof window.gtag === 'function') window.gtag('event', name, Object.assign({transport_type:'beacon'}, params||{})); }catch(_){}
 }
 // Instagram のハッシュタグ: 空白を除く。記号（（）・「」など）はタグに使えず途中で切れるので一緒に除く
 const igTag = name => name.replace(/[\s　]+/g,'').replace(/[^\p{L}\p{N}_]/gu,'');
@@ -3477,7 +3541,7 @@ function snsHtml(r){
 
 async function copyLink(btn){
   writeHashNow();
-  const url=location.href;
+  const url = curRec ? shareUrlOf(curRec.id) : location.href;
   let ok=false;
   try{
     if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(url); ok=true; }
@@ -3490,7 +3554,7 @@ async function copyLink(btn){
     ta.remove();
   }
   btn.textContent = ok ? 'コピーしました' : 'コピーできませんでした（アドレスバーからコピーしてください）';
-  setTimeout(()=>{ btn.textContent='このページのリンクをコピー'; }, 1800);
+  setTimeout(()=>{ btn.textContent=COPY_LABEL; }, 1800);
 }
 
 function drawSlide(){
@@ -3569,7 +3633,9 @@ function fitFrame(ph, strip, ar){
   ar = Math.min(16/9, Math.max(4/5, ar));
   const w = ph.clientWidth * (strip.classList.contains('multi') ? .88 : 1);   // 1枚ぶんの幅（2枚以上は次の写真の端を見せる分だけ狭い）
   if(w < 50) return;
-  const cap = window.innerHeight * (MOBILE.matches ? .32 : .6);
+  // スマホ: シートが半分のときでも、写真の下の名前の行が下端の「詳しく見る」に隠れない高さまで（画面の低い機種ほど低く）
+  const vh = window.innerHeight;
+  const cap = MOBILE.matches ? Math.max(100, Math.min(vh * .24, vh * .5 - 190)) : vh * .6;
   ph.style.aspectRatio = 'auto';
   ph.style.height = Math.round(Math.min(w / ar, cap)) + 'px';
 }

@@ -15,6 +15,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../../../assets/page.css">
+<script>(function(){if(location.hostname!=='bunkazai.tokiyado.net')return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('js',new Date());gtag('config','G-W8EHXMSRNE');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-W8EHXMSRNE';document.head.appendChild(s);})();</script>
 </head>
 <body>
 <header class="top"><div class="in"><a class="site" href="../../../">登録有形文化財マップ</a><nav aria-label="パンくずリスト"><ol class="crumbs"><li><a href="../../../">地図</a></li><li><a href="../../../pref/">都道府県</a></li><li><a href="../../../pref/aichi/">愛知県</a></li><li aria-current="page">知多市</li></ol></nav></div></header>
@@ -25,6 +26,21 @@
 <section><h2>分類ごとの件数</h2><div class="counts"><div><span class="sw" style="background:var(--c4)"></span>官公庁舎<span class="n">1</span></div><div><span class="sw" style="background:var(--c7)"></span>文化福祉<span class="n">6</span></div><div><span class="sw" style="background:var(--c8)"></span>産業2次<span class="n">6</span></div><div><span class="sw" style="background:var(--c9)"></span>産業3次<span class="n">1</span></div></div></section>
 <section><h2>物件の一覧</h2><h3 class="sub"><span class="sw" style="background:var(--c4)"></span> 官公庁舎（1件）</h3><ul class="plist"><li><a href="../../../p/00009474/">知多岡田簡易郵便局</a><span class="m">1902年竣工</span></li></ul><h3 class="sub"><span class="sw" style="background:var(--c7)"></span> 文化福祉（6件）</h3><ul class="plist"><li><a href="../../../p/00010804/">旧岡田医院給水塔</a><span class="m">1929年竣工</span></li><li><a href="../../../p/00010802/">旧岡田医院蔵</a><span class="m">1931年竣工</span></li><li><a href="../../../p/00010800/">旧岡田医院主屋</a><span class="m">1929年竣工</span></li><li><a href="../../../p/00010801/">旧岡田医院診療所棟</a><span class="m">1929年竣工</span></li><li><a href="../../../p/00010803/">旧岡田医院道具蔵</a><span class="m">1929年竣工</span></li><li><a href="../../../p/00010805/">旧岡田医院塀</a><span class="m">1929年竣工</span></li></ul><h3 class="sub"><span class="sw" style="background:var(--c8)"></span> 産業2次（6件）</h3><ul class="plist"><li><a href="../../../p/00011730/">旧中七木綿本店北蔵</a><span class="m">1914年竣工</span></li><li><a href="../../../p/00011729/">旧中七木綿本店作業所・寄宿舎</a><span class="m">1914年竣工</span></li><li><a href="../../../p/00011725/">旧中七木綿本店主屋（旧事務所）</a><span class="m">1914年竣工</span></li><li><a href="../../../p/00011727/">旧中七木綿本店長屋門</a><span class="m">1914年竣工</span></li><li><a href="../../../p/00011728/">旧中七木綿本店塀</a><span class="m">1914年竣工</span></li><li><a href="../../../p/00011726/">旧中七木綿本店南蔵</a><span class="m">1914年竣工</span></li></ul><h3 class="sub"><span class="sw" style="background:var(--c9)"></span> 産業3次（1件）</h3><ul class="plist"><li><a href="../../../p/00009967/">木綿蔵ちた（旧竹内虎王商店木綿蔵）</a><span class="m">大正前期（推定）</span></li></ul></section>
 </main>
-<footer class="site"><div class="in">出典：文化庁「<a href="https://kunishitei.bunka.go.jp/" rel="noopener" target="_blank">国指定文化財等データベース</a>」（登録有形文化財・建造物）。分類の推定・竣工年の推定・位置の一部は当サイトによるものです。地図：地理院タイル。<br><a href="../../../">地図で探す</a>　<a href="../../../pref/">都道府県別の一覧</a></div></footer>
+<footer class="site"><div class="in">出典：文化庁「<a href="https://kunishitei.bunka.go.jp/" rel="noopener" target="_blank">国指定文化財等データベース</a>」（登録有形文化財・建造物）。分類の推定・竣工年の推定・位置の一部は当サイトによるものです。地図：地理院タイル。<br><a href="../../../">地図で探す</a>　<a href="../../../pref/">都道府県別の一覧</a><br><span class="ga">アクセス解析に Google アナリティクスを使っています（Cookie を使い、ページの閲覧やリンクのクリックを個人を特定しない形で集計します）。送信される情報と送信先は <a href="../../../external/">外部送信について</a> をご覧ください。</span></div></footer>
+<script>
+(function(){
+  function track(n,p){ try{ if(typeof gtag==='function') gtag('event',n,Object.assign({transport_type:'beacon'},p||{})); }catch(e){} }
+  var id=(location.pathname.match(/\/p\/(\d{8})\//)||[])[1]||'';
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest('[data-copy],[data-ev],a[href*="#id="]'); if(!a) return;
+    if(a.hasAttribute('data-copy')){
+      var u=a.getAttribute('data-copy'), done=function(ok){ a.textContent=ok?'コピーしました':'コピーできませんでした'; setTimeout(function(){a.textContent='リンクをコピー';},1800); };
+      if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(u).then(function(){done(true)},function(){done(false)}); } else { done(false); }
+      track('share',{method:'copy_link',content_type:'property',item_id:id});
+    } else if(a.getAttribute('data-ev')==='share_x'){ track('share',{method:'x',content_type:'property',item_id:id}); }
+    else { track('open_map',{property_id:id}); }
+  });
+})();
+</script>
 </body>
 </html>

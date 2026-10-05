@@ -163,6 +163,17 @@ section.en{scroll-margin-top:12px}
 .livenote{font-size:12px; color:var(--dim2); margin:6px 0 0}
 /* 位置の地図の営業中のピンは live_pin.css（build_pages.py がこのファイルの後ろに付ける） */
 
+/* SNS・共有 */
+.sharebox .maplinks{margin-top:0}
+.sharebox button.btn{background:transparent; cursor:pointer; font:inherit; font-size:13px}
+.sharebox .note .u{word-break:break-all; color:var(--fg2)}
+footer.site .ga{display:block; margin-top:6px; font-size:11.5px}
+
+/* 自前の写真がない物件: 位置の地図をページの一番上に。下に文化庁の写真へのリンク */
+section.maptop{margin-top:0; margin-bottom:22px}
+.dbphoto{margin:8px 0 0; font-size:13px}
+.dbphoto a{color:var(--fg2)}
+
 /* 今入れる文化財（営業中）のピン。地図アプリ（build_html.py が差し込む）と物件ページの位置の地図（build_pages.py が
    page.css の後ろに付ける）で共通。CSS だけで動かす（ぼかし・回転は使わない）。
    形:  .lpin（先端＝座標が原点）
