@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 10:03） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-05 10:47） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -400,7 +400,16 @@ select:focus{border-color:var(--line2)}
   body #mineFloat button{flex:0 0 auto; padding:5px 9px; font-size:11.5px}
 }
 
-/* ---- 訪問状態の切り替え（地図の上に浮かぶボタン） ---- */
+/* ---- 地図の上の絞り込みバー ---- */
+/* パソコン: 右に物件カード・ようこそが出ている間は、見えている地図の範囲（右のパネルの分を除く）の中央、
+   狭ければ拡大縮小ボタンの右隣に置く。それでも入りきらない幅では2段にして、どのボタンもパネルの下に隠れないようにする */
+@media (min-width: 769px){
+  body.side-open #mineFloat{left:max(52px, calc((100% - 378px) / 2 - 190px)); transform:none;
+    max-width:calc(100% - 378px - 60px); flex-wrap:wrap; row-gap:2px; border-radius:14px}
+  body.side-open #mineFloat::-webkit-scrollbar{display:none}
+  body.side-open #mineFloat button{flex:0 0 auto; padding:5px 9px; font-size:11.5px; letter-spacing:.02em}
+  body.side-open #mineFloat .sep{margin:4px 1px}
+}
 #mineFloat{position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1005; display:flex; gap:2px;
   padding:3px; background:var(--glass); border:1px solid var(--line2); border-radius:18px;
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 2px 10px rgba(0,0,0,.18)}
@@ -926,7 +935,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
     <div id="stage">
       <div id="map"></div>
       <canvas id="dots"></canvas>
-      <div id="mineFloat" role="group" aria-label="訪問状態（撮影済み・未撮影）" hidden></div>
+      <div id="mineFloat" role="group" aria-label="絞り込み" hidden></div>
       <div id="yearOverlay" hidden><span class="y" id="ovY"></span><span class="w" id="ovW"></span></div>
       <div id="tiles"><div id="tilegrid"></div><div id="tilefoot"></div></div>
       <div id="card" class="hidden"></div>
@@ -1005,7 +1014,7 @@ body.nophoto #card .ph.has-photos{aspect-ratio:4/3; min-height:0}   /* 自分の
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-05 10:03", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-05 10:47", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1019,6 +1028,12 @@ const PHOTO_ORDER = {"00000773":["2023-08-24_142045.jpeg","2023-08-24_142051.jpe
 /* 今も使われている文化財（content/{ID}.md の living: true。自分で確認した物件だけ）。build_html.py が作る
    {label:"生きている文化財", filter:"今入れる文化財", items:{物件ID:{use, verified:"2026年9月確認", url, icon}}} */
 const LIVING = {"label":"生きている文化財","filter":"今入れる文化財","accent":"#FFB800","items":{"00009682":{"use":"カフェ","verified":"2026年9月確認","url":"https://cafe-asanisimasa.com/"}}};
+/* 一般の人向けの表示名（pages_config.json の public_labels。build_html.py が差し込む） */
+const LBL = {"owner":"ときやど","photo_count":"ときやど撮影の写真あり {n} 件","photo_caption":"ときやど撮影","photo_short":"写真あり","recent_title":"ときやどが最近撮った文化財","filter_all":"すべて","filter_photo":"写真あり","visited":"行った","not_visited":"まだ"};
+/* 管理モード（URL に #admin=1）。ときやどの撮影管理用の表示（撮影済み／未撮影・撮影の目安・充足率など）はこのときだけ出す。
+   一般の人には「ときやど撮影の写真あり」と、その人自身の図鑑の記録（行った／まだ）を出す */
+const ADMIN = /(^|[#&])admin=1(&|$)/.test(location.hash);
+if(ADMIN) document.documentElement.classList.add('admin');
 let LIVE_FLAG = null, LIVE_LIST = [];      // 物件ごとの「営業中」フラグと、その物件の番号の一覧
 document.documentElement.style.setProperty('--accent', LIVING.accent);
 /* 英語の概要（content/{ID}.md の ## English がある物件の分だけ）{物件ID: HTML} */
@@ -1080,7 +1095,7 @@ const GEO_MISSING = 2, SRC_ESTIMATED = 2;
 const F = {
   cat:null, type:null, src:null,
   ymin:0, ymax:0, showNull:true,
-  pref:'', city:-1, q:'', qRaw:'', photo:null, mine:0,  // mine: 0=すべて 1=撮影済み 2=未撮影
+  pref:'', city:-1, q:'', qRaw:'', photo:null, mine:0,  // mine: 0=すべて／管理: 1=撮影済み 2=未撮影／一般: 3=写真あり 4=行った 5=まだ
   live:0                                                 // 1 = 今入れる文化財（営業中）だけ
 };
 let MINE_FLAG = null, MINE_TOTAL = 0;   // 物件ごとの「自分の写真あり」フラグ
@@ -1240,7 +1255,7 @@ function parseHash(){
   if(raw.pref) H.pref=raw.pref;
   if(raw.city) H.city=raw.city;
   if(raw.photo==='1'||raw.photo==='0') H.photo=+raw.photo;
-  if(raw.mine==='1' || raw.mine==='2') H.mine=+raw.mine;
+  if(/^[1-5]$/.test(raw.mine||'')) H.mine=+raw.mine;
   if(raw.live==='1') H.live=1;
   if(raw.q) H.q=raw.q;
   if(raw.id) H.id=raw.id;
@@ -1266,7 +1281,7 @@ function applyHashToFilters(H){
     if(i>=0) F.city=i;
   }
   if(H.photo!=null) F.photo=new Set([H.photo]);
-  if(H.mine) F.mine=H.mine;
+  if(H.mine && (ADMIN ? H.mine<=2 : H.mine>=3)) F.mine=H.mine;
   if(H.live) F.live=1;
   if(H.q){ F.qRaw=H.q; F.q=H.q.toLowerCase(); }
 }
@@ -1284,6 +1299,7 @@ function hashFromState(){
   if(F.city>=0) put('city', IDX.cities[F.city]);
   if(F.photo.size===1) put('photo', [...F.photo][0]);
   if(F.mine) put('mine', F.mine);
+  if(ADMIN) put('admin', 1);
   if(F.live) put('live', 1);
   if(F.qRaw) put('q', F.qRaw);
   if(curId) put('id', curId);
@@ -1530,7 +1546,8 @@ function drawDrop(ctx, x, y, color, opt){
   ctx.shadowColor = 'transparent';
   ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.strokeStyle = '#fff';
   ctx.stroke();
-  if(opt.check) drawCheck(ctx, x, cy, 6, 2.4);    // 頭の中に白いチェック（撮影済み・訪問済みの印）
+  if(opt.check) drawCheck(ctx, x, cy, 6, 2.4);    // 頭の中に白いチェック（行った／管理モードでは撮影済みも）
+  else { ctx.beginPath(); ctx.arc(x, cy, 4.5, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill(); }   // 写真あり（白い点）
   ctx.restore();
 }
 /* しずくの上に名前のラベル（白地・角丸。長い名前は … で切る） */
@@ -1573,10 +1590,12 @@ const PinMarker = L.CircleMarker.extend({
     const i = this.__i;
     if(LIVE_FLAG && LIVE_FLAG[i]) return;         // 営業中のピンは HTML（livePane）で描く
     drawDrop(rd._ctx, this._point.x, this._point.y, this.options.fillColor,
-             {check: !!(MINE_FLAG && MINE_FLAG[i]) || VISITS.has(ids[i])});
+             {check: pinChecked(i)});
     if(this._map && this._map.getZoom() >= LABEL_Z) drawLabel(rd._ctx, this._point.x, this._point.y, names[this.__i]);
   }
 });
+/* ピンのチェック: 一般の人にはその人が図鑑で「行った」物件だけ。管理モードではときやどの撮影済みも */
+function pinChecked(i){ return VISITS.has(ids[i]) || !!(ADMIN && MINE_FLAG && MINE_FLAG[i]); }
 function isSpecial(i){ return !!(MINE_FLAG && MINE_FLAG[i]) || VISITS.has(ids[i]) || !!(LIVE_FLAG && LIVE_FLAG[i]); }
 function pinStyle(i){
   const c = CAT_COLORS[cat[i]];
@@ -1586,6 +1605,7 @@ function pinStyle(i){
 }
 /* 訪問の記録が変わった物件のピンを描き直す（ids を省くと全部） */
 function refreshPins(pidList){
+  if(F.mine===4 || F.mine===5) scheduleFilter(0);
   const list = pidList ? pidList.map(id=>idIndex.get(id)).filter(i=>i!=null) : markers.map((m,i)=>i);
   for(const i of list){
     const m = markers[i]; if(!m) continue;
@@ -1611,7 +1631,7 @@ function specialToFront(){
    クラスタの中に入っているときは出さない。押したときの判定は canvas のピンのまま */
 const LIVE_SVG_PATH = 'M14 38C12 32 2 25 2 14A12 12 0 1 1 26 14C26 25 16 32 14 38Z';   // DROP_SVG と同じ形
 function livePinHtml(i, label){
-  const chk = !!(MINE_FLAG && MINE_FLAG[i]) || VISITS.has(ids[i]);
+  const chk = pinChecked(i);
   return '<span class="lpin" style="--pin:'+CAT_COLORS[cat[i]]+'"><span class="lp-ripple"></span><span class="lp-shadow"></span>'
     + '<span class="lp-body"><svg viewBox="0 0 28 40" aria-hidden="true">'
     + '<path d="'+LIVE_SVG_PATH+'" fill="var(--pin)" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>'
@@ -1635,7 +1655,7 @@ function updateLiveMarkers(){
     const m = markers[i];
     const show = !!(m && m._map && b.contains(m.getLatLng()));
     let lm = liveMk.get(i);
-    const chk = !!(MINE_FLAG && MINE_FLAG[i]) || VISITS.has(ids[i]);
+    const chk = pinChecked(i);
     if(lm && (!show || lm._chk !== chk)){ lm.remove(); liveMk.delete(i); lm = null; }   // 画面の外に出た・訪問の記録が変わった
     if(show && !lm){
       lm = L.marker(m.getLatLng(), {pane:'livePane', interactive:false, keyboard:false,
@@ -1745,7 +1765,7 @@ function applyFilters(){
   const q=F.q, ymin=F.ymin, ymax=F.ymax, showNull=F.showNull;
   const cCat=new Uint32Array(nc), cType=new Uint32Array(nt), cSrc=new Uint32Array(3), cPhoto=new Uint32Array(2);
   let exYear=0, exSrc=0, exType=0, exPref=0, exPhoto=0, exCity=0;
-  const fcity=F.city, fmine=MINE_FLAG ? F.mine : 0;
+  const fcity=F.city, fmine=(MINE_FLAG || F.mine>=4) ? F.mine : 0;
   const visIdx=[];
   for(let i=0;i<N;i++){
     const fc = catOn[cat[i]] ? 0 : 1;
@@ -1756,8 +1776,10 @@ function applyFilters(){
     const fp = photoOn[photo[i]] ? 0 : 1;
     const fr = (prefOk && !prefOk[prf[i]]) ? 1 : 0;
     const fm = (fcity>=0 && city[i]!==fcity) ? 1 : 0;
-    if(fmine===1 && !MINE_FLAG[i]) continue;   // 撮影済みだけ
-    if(fmine===2 &&  MINE_FLAG[i]) continue;   // 未撮影だけ
+    if((fmine===1 || fmine===3) && !MINE_FLAG[i]) continue;   // 撮影済み・写真ありだけ
+    if(fmine===2 &&  MINE_FLAG[i]) continue;                   // 未撮影だけ（管理）
+    if(fmine===4 && !VISITS.has(ids[i])) continue;             // その人が行った（図鑑）
+    if(fmine===5 &&  VISITS.has(ids[i])) continue;             // まだ
     if(F.live && !LIVE_FLAG[i]) continue;      // 今入れる文化財（営業中）だけ
     // 検索語は名称と所在地の両方に当てる（「尾鷲」のような地名でも引けるように）
     const fq = (q && namesL[i].indexOf(q)<0 && addrL[i].indexOf(q)<0) ? 1 : 0;
@@ -1797,7 +1819,7 @@ function applyFilters(){
                                        : '母数 '+fmt(exCity)+' 件';
   CNT.poolPhoto.textContent= '母数 '+fmt(exPhoto)+' 件';
   CNT.poolQ.textContent    = F.q ? ('一致 '+fmt(V)+' 件') : '';
-  if(MINE) renderCoverage(visIdx);
+  if(MINE && ADMIN) renderCoverage(visIdx);
 
   if(ANIM.playing){
     drawDots();
@@ -2023,7 +2045,7 @@ function mapsUrl(i){
   return 'https://www.google.com/maps/search/?api=1&query='+lat[i].toFixed(6)+','+lng[i].toFixed(6);
 }
 function shotHtml(i){
-  if(!MINE || i<0) return '';
+  if(!MINE || i<0 || !ADMIN) return '';
   const done = MINE.byId[ids[i]] || [];
   const dates=[...new Set(done.map(p=>p.date))].sort();
   const status = done.length ? '撮影済み（'+dates.join('・')+'／'+done.length+'枚）' : '未撮影';
@@ -2063,22 +2085,27 @@ function showWelcome(){
   const md=String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
   const doy=s=>{ const [m,d]=s.split('-').map(Number); return (Date.UTC(2001,m-1,d)-Date.UTC(2001,0,1))/864e5; };
   const past=all.filter(ph=>ph.date.slice(0,4)!==y);
-  let otd=onePerPlace(past.filter(ph=>ph.date.slice(5)===md)), otdTitle='あの日の今日（'+(now.getMonth()+1)+'月'+now.getDate()+'日）';
+  let otd=onePerPlace(past.filter(ph=>ph.date.slice(5)===md)), otdTitle=(ADMIN?'':LBL.owner+'の')+'あの日の今日（'+(now.getMonth()+1)+'月'+now.getDate()+'日）';
   if(!otd.length){
     const t=doy(md);
     otd=onePerPlace(past.filter(ph=>{ const g=Math.abs(doy(ph.date.slice(5))-t); return Math.min(g,365-g)<=14; }));
-    otdTitle='この時期に撮った文化財（前後2週間）';
+    otdTitle=(ADMIN?'':LBL.owner+'が')+'この時期に撮った文化財（前後2週間）';
   }
   otd=otd.slice(0,6);
   const fmt=n=>n.toLocaleString();
   let html='<button class="x" aria-label="閉じる">×</button>'
     + '<div class="wh">登録有形文化財（建造物）マップ</div>'
-    + '<div class="ws">全国 '+fmt(N)+' 件'+(MINE?' ・ 自分で撮影 '+fmt(MINE_TOTAL)+' 件（'+(N?(MINE_TOTAL/N*100).toFixed(MINE_TOTAL/N*100<0.1?2:1):0)+'%）':'')+'</div>';
-  if(recent.length) html+='<div class="wsec"><div class="t">最近撮った文化財</div><div class="wgrid">'+recent.map(welcomeTile).join('')+'</div></div>';
+    + '<div class="ws">全国 '+fmt(N)+' 件'
+      + (MINE && MINE_TOTAL ? (ADMIN ? ' ・ 自分で撮影 '+fmt(MINE_TOTAL)+' 件（'+(N?(MINE_TOTAL/N*100).toFixed(MINE_TOTAL/N*100<0.1?2:1):0)+'%）'
+                                     : ' ・ '+esc(LBL.photo_count.replace('{n}', fmt(MINE_TOTAL)))) : '')
+      + (!ADMIN && VISITS.ids().length ? ' ・ あなたが行った '+fmt(VISITS.ids().filter(id=>idIndex.has(id)).length)+' 件' : '')
+      + '</div>';
+  if(recent.length) html+='<div class="wsec"><div class="t">'+esc(ADMIN ? '最近撮った文化財' : LBL.recent_title)+'</div><div class="wgrid">'+recent.map(welcomeTile).join('')+'</div></div>';
   if(otd.length) html+='<div class="wsec"><div class="t">'+esc(otdTitle)+'</div><div class="wgrid">'+otd.map(welcomeTile).join('')+'</div></div>';
   html+='<div class="whint">左の「<b>場所・名称で探す</b>」に市町村名や名前を入れると、その場所へ移ります。'
     + '上の「<b>近くの文化財</b>」で、今いる場所から近い順に並びます。'
-    + (MINE?'「<b>未撮影</b>」に絞ると、まだ撮っていない物件だけになります。':'')
+    + (ADMIN && MINE ? '「<b>未撮影</b>」に絞ると、まだ撮っていない物件だけになります。'
+        : 'カードの「<b>訪問した！</b>」で記録すると、上の「<b>'+esc(LBL.visited)+'</b>」「<b>'+esc(LBL.not_visited)+'</b>」で絞り込めます（記録はこの端末の中だけ）。')
     + '</div>';
   box.innerHTML=html;
   box.hidden=false;
@@ -2235,10 +2262,12 @@ function buildUI(){
   $('#typeAll').onclick=()=>{ IDX.types.forEach((_,i)=>F.type.add(i)); refreshTypeChips(); scheduleFilter(0); };
 
   // 自分の写真（すべて / 撮影済み / 未撮影 の切り替え。ひとつだけ選ぶ）
-  if(MINE){
-    $('#mineBox').hidden=false;
+  {
+    if(ADMIN && MINE) $('#mineBox').hidden=false;      // 充足率と案内は管理モードだけ
     const mc=$('#mineChips'), mf=$('#mineFloat');
-    [[0,'すべて'],[1,'撮影済み'],[2,'未撮影']].forEach(([v,label])=>{
+    const opts = ADMIN && MINE ? [[0,'すべて'],[1,'撮影済み'],[2,'未撮影']]
+      : [[0, LBL.filter_all]].concat(MINE_TOTAL ? [[3, LBL.filter_photo]] : [], [[4, LBL.visited], [5, LBL.not_visited]]);
+    opts.forEach(([v,label])=>{
       const c=document.createElement('span');
       c.className='chip'+(F.mine===v?' on':''); c.dataset.v=v; c.textContent=label;
       c.onclick=()=>setMine(v);
@@ -2256,7 +2285,7 @@ function buildUI(){
   // 今入れる文化財（営業中）の絞り込み。訪問状態のボタンの隣に置く
   if(LIVE_LIST.length){
     const mf=$('#mineFloat');
-    if(MINE){ const sep=document.createElement('span'); sep.className='sep'; mf.appendChild(sep); }
+    { const sep=document.createElement('span'); sep.className='sep'; mf.appendChild(sep); }
     const b=document.createElement('button');
     b.type='button'; b.id='liveBtn'; b.className='live'+(F.live?' on':'');
     b.title=LIVING.label+'：今もカフェ・宿・店などとして使われていて、中に入れる文化財';
@@ -2371,7 +2400,7 @@ function buildUI(){
     location.reload();
   };
   // 上部バーの題名を押すと「ようこそ」（最近撮った文化財など）をもう一度出す
-  document.querySelector('#topbar .title').title='最近撮った文化財などを表示';
+  document.querySelector('#topbar .title').title=ADMIN ? '最近撮った文化財などを表示' : LBL.recent_title+'などを表示';
   document.querySelector('#topbar .title').onclick=()=>{ closeCard(); showWelcome(); };
   $('#aboutClose').onclick=closeAbout;
   $('#about').onclick=e=>{ if(e.target.id==='about') closeAbout(); };
@@ -2445,6 +2474,14 @@ function syncMineButtons(){
     el.classList.toggle('on', on); el.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 }
+
+/* 右のパネル（物件カード・ようこそ）が出ているか。絞り込みバーの位置に使う */
+function syncSideOpen(){
+  const c=$('#card'), w=$('#welcome');
+  document.body.classList.toggle('side-open', (c && !c.classList.contains('hidden')) || (w && !w.hidden));
+}
+['card','welcome'].forEach(id=>{ const el=document.getElementById(id);
+  if(el) new MutationObserver(syncSideOpen).observe(el, {attributes:true, attributeFilter:['hidden','class']}); });
 
 const NARROW = window.matchMedia('(max-width: 899px)');
 const MOBILE = window.matchMedia('(max-width: 768px)');
@@ -2854,7 +2891,8 @@ function renderNear(){
     const li=document.createElement('li');
     li.innerHTML='<span class="k">'+(k+1)+'</span><span class="sw" style="background:'+CAT_COLORS[cat[i]]+'"></span>'
       +'<span class="nm" title="'+esc(names[i])+'">'+esc(names[i])+'</span>'
-      +(MINE_FLAG && MINE_FLAG[i] ? '<span class="done">撮影済</span>' : '')
+      +(VISITS.has(ids[i]) ? '<span class="done">'+esc(LBL.visited)+'</span>'
+        : MINE_FLAG && MINE_FLAG[i] ? '<span class="done">'+esc(ADMIN ? '撮影済' : LBL.photo_short)+'</span>' : '')
       +'<span class="d">'+fmtDist(haversine(la, ln, lat[i], lng[i]))+'</span>';
     li.onclick=()=>{
       openCard(i);
@@ -3084,7 +3122,7 @@ function drawCard(r, ci){
   // 決めていなければ、撮影が新しい順に文化庁の写真のあとへ
   mineSlot=new Map();
   const addMine=()=>mineOrdered(r.id).forEach(p=>{
-    mineSlot.set(p, gal.length); gal.push([MINE_DIR+p.path]); galCap.push('自分の写真 '+p.date+(p.time?' '+p.time:'')); });
+    mineSlot.set(p, gal.length); gal.push([MINE_DIR+p.path]); galCap.push((ADMIN ? '自分の写真 ' : LBL.photo_caption+' ')+p.date+(p.time?' '+p.time:'')); });
   if(PHOTO_ORDER[r.id]){ addMine(); addDb(); } else { addDb(); addMine(); }
   galI=0;
 
