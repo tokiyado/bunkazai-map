@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 10:46） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 15:14） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -56,6 +56,14 @@
 }
 *{box-sizing:border-box}
 .legend{list-style:none; margin:4px 0 12px; padding:0; display:grid; gap:7px}
+/* 凡例（地図の右上の「凡例」ボタンから開く小さなパネル） */
+.lg-btn{min-width:44px; height:34px; padding:0 10px; border:0; background:var(--input-bg); color:var(--fg); font-size:12.5px; cursor:pointer}
+.lg-btn[aria-expanded="true"]{background:var(--sel); color:var(--sel-ink)}
+#legendBox{position:absolute; z-index:1007; width:min(300px, calc(100% - 24px)); max-height:calc(100% - 24px); overflow:auto;
+  padding:10px 14px 12px; background:var(--panel-solid); border:1px solid var(--line2); border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#legendBox .lg-head{display:flex; align-items:center; justify-content:space-between; margin:0 0 6px; font-family:var(--font-head); font-size:14px; font-weight:600}
+#legendBox .x{width:36px; height:36px; border:0; background:none; color:var(--dim); font-size:18px; cursor:pointer}
+#legendBox .note{font-size:11px; color:var(--dim2); line-height:1.6; margin-top:4px}
 .legend li{display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--fg2); line-height:1.5}
 .legend li > svg, .legend .lg-cl{flex:0 0 18px}
 .legend .lg-cl{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%;
@@ -447,16 +455,17 @@ select:focus{border-color:var(--line2)}
 .psec .fg{margin-bottom:14px}
 #paneTop .summary{display:flex; align-items:baseline; gap:10px; margin:12px 0 0; padding-top:10px; border-top:1px solid var(--line)}
 #paneTop .summary b{font-size:18px}
-#paneTop .summary .sumt{color:var(--dim2)}
+#paneTop .summary .sumt{color:var(--dim2); font-size:11.5px}
+#paneTop .summary .suml{font-size:12.5px; color:var(--dim); margin-right:2px}
 #paneTop .reset{margin-left:auto; border:0; background:transparent; color:var(--brand); font-size:12px; cursor:pointer; padding:4px 0; text-decoration:underline; text-underline-offset:3px}
 #paneBack{position:sticky; top:0; z-index:5; background:var(--panel); border-bottom:1px solid var(--line); margin:0 -20px; padding:0 20px}
 #backBtn{display:flex; align-items:center; gap:6px; min-height:44px; border:0; background:transparent; color:var(--fg); font-size:13px; cursor:pointer; padding:0}
 #backBtn:hover #backLabel{text-decoration:underline; text-underline-offset:3px}
 /* 結果の一覧 */
-.res-head{display:flex; align-items:baseline; gap:10px; margin:18px 0 2px}
+.res-head{display:flex; align-items:baseline; gap:0; margin:18px 0 2px}
 .res-head h2:focus{outline:none}
 .res-head h2{font-family:var(--font-head); font-size:18px; font-weight:600; letter-spacing:.04em}
-.res-n{font-size:12px; color:var(--dim2); font-variant-numeric:tabular-nums}
+.res-n{font-size:14px; color:var(--fg2); font-variant-numeric:tabular-nums}
 .actconds{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px}
 .actconds button{display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 6px 0 12px; border:1px solid var(--line2); border-radius:17px;
   background:var(--input-bg); color:var(--fg); font-size:12.5px; cursor:pointer}
@@ -717,6 +726,7 @@ body.picking .leaflet-interactive{pointer-events:none!important}
 #card .where{margin:8px 0 12px; font-size:13px; color:var(--fg2); line-height:1.6}
 #card .where .dot{color:var(--dim2); margin:0 4px}
 #card .morebtn{margin:4px 0 4px}
+#card .obtn.mapapp{display:flex; width:100%; margin:8px 0 0}
 #card .cs{margin-top:22px; padding-top:14px; border-top:1px solid var(--line)}
 #card .cs h3{margin:0 0 10px; font-family:var(--font-head); font-size:15px; font-weight:600; letter-spacing:.06em; color:var(--fg)}
 #card .cs .sub{margin:10px 0 4px; font-size:11px; letter-spacing:.08em; color:var(--dim2)}
@@ -1025,6 +1035,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
   .sh-row{display:flex; align-items:center; gap:2px; min-height:48px}
   .sh-title{flex:1 1 auto; min-width:0; padding:0 8px; font-family:var(--font-head); font-size:16px; font-weight:600; letter-spacing:.03em;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .sh-title .n.tight{margin-left:0}
   .sh-title .n{font-family:var(--font-ui); font-weight:400; font-size:12.5px; color:var(--dim); margin-left:8px; letter-spacing:0}
   .sh-btn{flex:0 0 44px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border:0; border-radius:22px;
     background:transparent; color:var(--fg); cursor:pointer; padding:0}
@@ -1132,7 +1143,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
         <div id="searchSlotPane">
           <div class="fg" id="searchBox">
             <h3>場所・名称で探す</h3>
-            <form id="qForm" action="#" role="search" onsubmit="return false"><input type="search" enterkeyhint="search" id="q" placeholder="地名・建物名で探す" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg" aria-label="地名・建物名で探す" aria-describedby="qHint"></form>
+            <form id="qForm" action="#" role="search" onsubmit="return false"><input type="search" enterkeyhint="search" id="q" placeholder="地名・文化財名で探す" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg" aria-label="地名・文化財名で探す" aria-describedby="qHint"></form>
             <div class="sugg" id="sugg" role="listbox" hidden></div>
             <div class="qhint" id="qHint" hidden>例：尾鷲、旅館、銀行</div>
             <div class="pool" id="poolQ"></div>
@@ -1160,19 +1171,6 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
         </div>
 
         <div class="psec" id="secCat" hidden>
-          <div class="fg">
-            <h3>地図の印の見方</h3>
-            <ul class="legend">
-              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" style="fill:var(--pin-dot)" stroke="#fff" stroke-width="1.5"/><circle cx="8" cy="8" r="6.4" fill="none" stroke="rgba(20,20,20,.55)" stroke-width=".8"/></svg><span>登録有形文化財</span></li>
-              <li><span class="lg-cl">12</span><span>近くの物件のまとまり（数字は件数。押すと広がります）</span></li>
-              <li class="lg-photo"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3" style="fill:var(--pin-main)" stroke="#fff" stroke-width="2"/><circle cx="8" cy="8" r="2.2" fill="#fff"/></svg><span id="lgPhoto">ときやど撮影の写真あり</span></li>
-              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" style="fill:var(--pin-main)" stroke="#fff" stroke-width="1.5"/><path d="M4.6 8.2l2.3 2.4 4.4-4.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="lgVisit">この端末で「行った」を記録した物件</span></li>
-              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" style="fill:var(--pin-main)" stroke="#fff" stroke-width="1.5"/><path d="M8 3.6l1.3 2.7 2.9.4-2.1 2 .5 2.9L8 10.2l-2.6 1.4.5-2.9-2.1-2 2.9-.4z" fill="#fff"/></svg><span id="lgSaved">この端末で「行きたい」に保存した物件</span></li>
-              <li class="lg-live"><svg width="16" height="18" viewBox="0 0 28 40" aria-hidden="true"><path d="M14 38C12 32 2 25 2 14A12 12 0 1 1 26 14C26 25 16 32 14 38Z" style="fill:var(--pin-main)" stroke="var(--accent)" stroke-width="2.5"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg><span id="lgLive">現役稼働（ときやどが利用を確認した物件）</span></li>
-            </ul>
-            <button type="button" class="toggle" id="tgCatColor" role="switch" aria-checked="false"><span class="box"></span><span>地図の点を分類ごとの色で表示する</span></button>
-            <div class="note">ふだんは1色で表示します。色分けしたときは、下の一覧の左の四角が色の見本です。</div>
-          </div>
           <div class="fg">
             <h3>分類 <span class="act" id="catAll">全選択</span></h3>
             <div class="catlist" id="catList"></div>
@@ -1223,7 +1221,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
           </div>
         </div>
 
-        <div class="summary"><span><b id="sumN">0</b>件 <span class="sumt">/ <span id="sumT">0</span></span></span>
+        <div class="summary"><span><span class="suml" id="sumL">全国：</span><b id="sumN">0</b>件 <span class="sumt" id="sumTot" hidden>/ 全国 <span id="sumT">0</span>件</span></span>
           <button type="button" class="reset" id="resetAll" hidden>条件をすべて解除</button></div>
 
         <button type="button" id="condDone">結果を表示</button>
@@ -1244,7 +1242,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
         </div>
         <div id="paneBack" hidden><button type="button" id="backBtn"><span aria-hidden="true">←</span> <span id="backLabel">一覧に戻る</span></button></div>
         <section id="resultList" hidden aria-labelledby="resTitle">
-          <div class="res-head"><h2 id="resTitle" tabindex="-1">この範囲の文化財</h2><span class="res-n" id="resN"></span></div>
+          <div class="res-head"><h2 id="resTitle" tabindex="-1">この地図の範囲</h2><span class="res-n" id="resN"></span></div>
           <div class="actconds" id="actConds" hidden></div>
           <p class="res-note" id="resNote"></p>
           <ol id="resList"></ol>
@@ -1275,6 +1273,19 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
     <p class="lead">物件を開いて「✓ 行った」で記録した文化財です。記録と写真はこの端末のブラウザの中だけに保存され、どこにも送られません。</p>
     <div id="zkBody"></div>
   </div>
+</div>
+<div id="legendBox" role="dialog" aria-labelledby="lgTitle" hidden>
+  <div class="lg-head"><span id="lgTitle">凡例（地図の印の見方）</span><button type="button" class="x" id="lgClose" aria-label="凡例を閉じる">×</button></div>
+            <ul class="legend">
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" style="fill:var(--pin-dot)" stroke="#fff" stroke-width="1.5"/><circle cx="8" cy="8" r="6.4" fill="none" stroke="rgba(20,20,20,.55)" stroke-width=".8"/></svg><span>登録有形文化財</span></li>
+              <li><span class="lg-cl">12</span><span>近くの物件のまとまり（数字は件数。押すと広がります）</span></li>
+              <li class="lg-photo"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3" style="fill:var(--pin-main)" stroke="#fff" stroke-width="2"/><circle cx="8" cy="8" r="2.2" fill="#fff"/></svg><span id="lgPhoto">ときやど撮影の写真あり</span></li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" style="fill:var(--pin-main)" stroke="#fff" stroke-width="1.5"/><path d="M4.6 8.2l2.3 2.4 4.4-4.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="lgVisit">この端末で「行った」を記録した物件</span></li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" style="fill:var(--pin-main)" stroke="#fff" stroke-width="1.5"/><path d="M8 3.6l1.3 2.7 2.9.4-2.1 2 .5 2.9L8 10.2l-2.6 1.4.5-2.9-2.1-2 2.9-.4z" fill="#fff"/></svg><span id="lgSaved">この端末で「行きたい」に保存した物件</span></li>
+              <li class="lg-live"><svg width="16" height="18" viewBox="0 0 28 40" aria-hidden="true"><path d="M14 38C12 32 2 25 2 14A12 12 0 1 1 26 14C26 25 16 32 14 38Z" style="fill:var(--pin-main)" stroke="var(--accent)" stroke-width="2.5"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg><span id="lgLive">現役稼働（ときやどが利用を確認した物件）</span></li>
+            </ul>
+            <button type="button" class="toggle" id="tgCatColor" role="switch" aria-checked="false"><span class="box"></span><span>地図の点を分類ごとの色で表示する</span></button>
+  <div class="note">ふだんは1色で表示します。色分けしたときは、「条件 → 分類」の一覧の左の四角が色の見本です。</div>
 </div>
 <div id="saved" class="modal" hidden>
   <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="svTitle">
@@ -1350,7 +1361,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-06 10:46", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-06 15:14", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1365,7 +1376,7 @@ const PHOTO_ORDER = {"00000773":["2023-08-24_142045.jpeg","2023-08-24_142051.jpe
    {label:"生きている文化財", filter:"今入れる文化財", items:{物件ID:{use, verified:"2026年9月確認", url, icon}}} */
 const LIVING = {"label":"生きている文化財","filter":"現役稼働の文化財","short":"現役稼働","accent":"#FFB800","items":{"00009682":{"use":"カフェ","verified":"2026年9月確認","url":"https://cafe-asanisimasa.com/"}}};
 /* 一般の人向けの表示名（pages_config.json の public_labels。build_html.py が差し込む） */
-const LBL = {"owner":"ときやど","photo_count":"ときやど撮影の写真あり {n} 件","photo_caption":"ときやど撮影","photo_short":"写真あり","recent_title":"ときやどが最近撮った文化財","filter_all":"すべて","filter_photo":"写真あり","visited":"行った","not_visited":"まだ","saved":"行きたい"};
+const LBL = {"owner":"ときやど","photo_count":"ときやど撮影の写真あり {n} 件","photo_caption":"ときやど撮影","photo_short":"写真あり","recent_title":"ときやどの撮影記録","filter_all":"すべて","filter_photo":"写真あり","visited":"行った","not_visited":"まだ","saved":"行きたい"};
 /* 管理モード（URL に #admin=1）。ときやどの撮影管理用の表示（撮影済み／未撮影・撮影の目安・充足率など）はこのときだけ出す。
    一般の人には「ときやど撮影の写真あり」と、その人自身の図鑑の記録（行った／まだ）を出す */
 const ADMIN = /(^|[#&])admin=1(&|$)/.test(location.hash);
@@ -1743,6 +1754,28 @@ function liveAt(cp){
   }
   return best;
 }
+/* 凡例のパネルの開閉。パネルは地図の枠の中、凡例ボタンのすぐ下に置く */
+function toggleLegend(open){
+  const box=$('#legendBox'), btn=$('#lgBtn'); if(!box || !btn) return;
+  if(open===undefined) open = box.hidden;
+  if(open){
+    const st=$('#stage'); if(box.parentNode!==st) st.appendChild(box);
+    const sr=st.getBoundingClientRect(), br=btn.getBoundingClientRect();
+    box.style.top = Math.round(br.bottom - sr.top + 6)+'px';
+    box.style.right = Math.round(sr.right - br.right)+'px';
+    // 下のシート・出典表示に隠れないよう、見えている地図の範囲に収める（入らない分は中でスクロール）
+    let bottom = sr.bottom;
+    if(MOBILE.matches){ const f=$('#filters'); bottom = Math.min(bottom, f.getBoundingClientRect().top); }
+    const at=document.querySelector('.leaflet-control-attribution'); if(at) bottom -= at.offsetHeight;
+    box.style.maxHeight = Math.max(160, Math.round(bottom - br.bottom - 14))+'px';
+    box.hidden=false; btn.setAttribute('aria-expanded','true');
+    $('#lgClose').focus({preventScroll:true});
+  } else {
+    if(box.hidden) return;
+    box.hidden=true; btn.setAttribute('aria-expanded','false');
+    if(box.contains(document.activeElement)) btn.focus({preventScroll:true});
+  }
+}
 /* 年代アニメーション中（点描画）の当たり判定。畳まれたピンが無いので全表示分から探す */
 function nearestDot(cp, maxPx){
   const {scale, ox, oy} = projInfo();
@@ -1872,6 +1905,20 @@ function initMap(){
     }
   });
   new Loc().addTo(map);
+  // 凡例ボタン（地図の右上）。押すと地図の上に小さな凡例のパネルを開く
+  const Lg = L.Control.extend({
+    options:{position:'topright'},
+    onAdd(){
+      const wrap=L.DomUtil.create('div','leaflet-bar');
+      const b=L.DomUtil.create('button','lg-btn',wrap);
+      b.type='button'; b.id='lgBtn'; b.textContent='凡例'; b.setAttribute('aria-expanded','false'); b.setAttribute('aria-controls','legendBox');
+      b.title='地図の印の見方';
+      L.DomEvent.disableClickPropagation(wrap);
+      b.onclick=()=>toggleLegend();
+      return wrap;
+    }
+  });
+  new Lg().addTo(map);
 
   map.on('click', e=>{
     if(NEAR.picking){ setBase(e.latlng.lat, e.latlng.lng); return; }
@@ -1955,7 +2002,7 @@ function initialView(H){
     map.on('moveend', saveView);
     map.on('moveend', ()=>{ resLimit = 50; scheduleList(); });
     map.on('dragstart zoomstart', ()=>{ autoPan = null; });   // 利用者が地図を動かしたら、詳細を閉じても元に戻さない
-    ['touchstart','mousedown','wheel'].forEach(t=>map.getContainer().addEventListener(t, ()=>{ userTouchedMap = true; }, {passive:true}));
+    ['touchstart','mousedown','wheel'].forEach(t=>map.getContainer().addEventListener(t, ()=>{ userTouchedMap = true; revealCenter = false; }, {passive:true}));
     map.on('moveend', ()=>{
       if(MOBILE.matches && curId!=null && idIndex.has(curId) && !userTouchedMap && performance.now() < revealUntil){
         revealPin(idIndex.get(curId));
@@ -2355,8 +2402,11 @@ function applyFilters(){
   const tFilter = performance.now()-t0;
 
   const V=visIdx.length, fmt=n=>n.toLocaleString();
+  // 上部は「条件に一致」の件数。条件が無ければ「全国」。全国の総数は絞り込んでいるときだけ小さく添える
+  $('#sumL').textContent = V<N ? '条件に一致：' : '全国：';
   $('#sumN').textContent = fmt(V);
   $('#sumT').textContent = fmt(N);
+  $('#sumTot').hidden = !(V<N);
   $('#topcount').textContent = fmt(V)+' / '+fmt(N);
   $('#fBtnN').textContent = V<N ? '絞込中' : '';
   updatePaneTabs();
@@ -2620,9 +2670,9 @@ function fitResults(){
   qPrev = null;            // このあと検索窓から離れても、シートを元の高さに戻さない
   SHEET.to(f, 'min');
   const b=mapViewBox(SHEET.px(f, 'min'));
-  const lb=$('#locBtn'), zc=document.querySelector('.leaflet-control-zoom');
+  const lb=$('#locBtn');
   const right = (lb ? lb.getBoundingClientRect().width + 12 : 12) + 14;   // ◎ ボタンの列
-  const left = (zc ? zc.getBoundingClientRect().width + 10 : 0) + 14;     // ＋－ボタンの列
+  const left = 14;   // ＋－ボタンは左上の小さな範囲だけなので、列ごとは避けない（狭い画面で地図を引きすぎないように）
   const M = 24;   // まとまりの丸の半径ぶん（丸の中心が端に来ても丸ごと見えるように）
   map.fitBounds(pts, {paddingTopLeft:[left, Math.round(b.top + M)], paddingBottomRight:[right, Math.round(b.height - b.bottom + M)],
                       maxZoom:16, animate:false});
@@ -2745,7 +2795,7 @@ function showWelcome(){
   html+='<div class="whint">検索窓に地名や建物名を入れると、その場所へ移ります。'
     + '地図の右下の「<b>◎</b>」で、今いる場所から近い順に並びます。'
     + (ADMIN && MINE ? '「<b>未撮影</b>」に絞ると、まだ撮っていない物件だけになります。'
-        : '気になる物件は「<b>☆ '+esc(LBL.saved||'行きたい')+'</b>」で保存でき、「≡」の「'+esc(LBL.saved||'行きたい')+'」から一覧で見られます。物件を開いて「<b>✓ 行った</b>」で記録すると、「<b>'+esc(LBL.visited)+'</b>」「<b>'+esc(LBL.not_visited)+'</b>」で絞り込めます（記録はこの端末の中だけ）。')
+        : '気になる物件は「<b>☆ '+esc(LBL.saved||'行きたい')+'</b>」で保存でき、メニューの「'+esc(LBL.saved||'行きたい')+'」から一覧で見られます。物件を開いて「<b>✓ 行った</b>」で記録すると、「<b>'+esc(LBL.visited)+'</b>」「<b>'+esc(LBL.not_visited)+'</b>」で絞り込めます（記録はこの端末の中だけ）。')
     + '<br>「<b>'+esc(LIVING.short||'現役稼働')+'</b>」は、店舗や宿として今も使われ、中に入れることを'+esc(LBL.owner)+'が確かめた物件です（営業日は各公式サイトでご確認ください）。'
     + '</div>';
   const wl = '<button type="button" class="wlist" id="wList"><span>地図の範囲の文化財を一覧で見る</span><span class="n"></span></button>';
@@ -2879,7 +2929,7 @@ function updateSheetHead(){
   else if(paneView==='cond') h = '条件で絞り込む';
   else if(paneView==='intro') h = 'はじめに';
   else if(placeOpen()) h = esc($('#placeList').dataset.title)+'<span class="n">'+esc($('#placeList').dataset.n)+'件</span>';
-  else h = esc($('#resTitle').textContent)+'<span class="n">'+esc($('#resN').textContent)+'</span>';
+  else h = esc($('#resTitle').textContent)+'<span class="n tight">'+esc($('#resN').textContent)+'</span>';
   t.innerHTML = h;
   b.hidden = !(paneView==='detail' || paneView==='cond' || (paneView==='list' && placeOpen()));
   b.setAttribute('aria-label', paneView==='cond' ? '結果に戻る' : paneView==='list' ? '結果の一覧に戻る' : paneFrom==='intro' ? 'はじめにに戻る' : '一覧に戻る');
@@ -2909,9 +2959,11 @@ function renderList(keepScroll){
   updateNearBar();
   const d2 = i => { const dy=lat[i]-c.lat, dx=(lng[i]-c.lng)*Math.cos(c.lat*Math.PI/180); return dy*dy+dx*dx; };
   items.sort((a,b)=>d2(a)-d2(b));
-  $('#resTitle').textContent = near ? (NEAR.label==='現在地' ? '現在地から近い順' : '基点から近い順') : 'この範囲の文化財';
-  $('#resN').textContent = items.length.toLocaleString()+'件';
-  $('#resNote').textContent = items.length ? (near ? '地図の範囲の中の物件を、近い順に並べています' : '地図の中心から近い順。地図を動かすと一覧も変わります') : '';
+  $('#resTitle').textContent = near ? (NEAR.label==='現在地' ? '現在地から近い順' : '基点から近い順') : 'この地図の範囲';
+  $('#resN').textContent = '：'+items.length.toLocaleString()+'件';
+  // スマホは上部の件数が無いので、絞り込んでいるときだけ「条件に一致」の件数（と全国の総数）を一覧の上に添える
+  const match = (MOBILE.matches && lastVisible.length < N) ? '条件に一致 '+lastVisible.length.toLocaleString()+'件（全国 '+N.toLocaleString()+'件中）。' : '';
+  $('#resNote').textContent = match + (items.length ? (near ? '地図の範囲の中の物件を、近い順に並べています' : '地図の中心から近い順。地図を動かすと一覧も変わります') : '');
   if(!items.length){
     ol.innerHTML=''; $('#resMore').hidden=true; empty.hidden=false;
     empty.innerHTML = lastVisible.length===0
@@ -2959,20 +3011,24 @@ function renderList(keepScroll){
    利用者が地図に触れたら、それ以降は動かさない */
 let revealUntil = 0, userTouchedMap = false;
 function watchReveal(){ revealUntil = performance.now() + 1500; userTouchedMap = false; }
-function revealPin(i){
+/* center: 一覧・検索・周辺の文化財などから開いたとき。隠れていなくても、見えている範囲の中央付近へ動かす */
+let revealCenter = false;
+function revealPin(i, center){
   if(!mapReady || !isFinite(lat[i])) return;
+  if(center===undefined) center = revealCenter;
   const f=$('#filters');
   const b = mapViewBox(SHEET.px(f, SHEET.state(f)||'mid'));
   const p = map.latLngToContainerPoint([lat[i], lng[i]]);
   // 選んでいるピンは、先端（座標）から上へ しずく 約55px＋名前 約25px
   const UP = 82, DOWN = 4;
   const hidden = p.y + DOWN > b.bottom || p.y - UP < b.top || p.x < 24 || p.x > b.width - 24;
-  if(!hidden) return;
-  if(!autoPan) autoPan = map.getCenter();
   // 見えている範囲の上下中央に、ピンと名前の全体を置く（範囲が狭いときは先端を下端の少し上に）
   const room = b.bottom - b.top;
   const ty = room > UP + DOWN + 20 ? (b.top + b.bottom)/2 + (UP - DOWN)/2 : b.bottom - DOWN - 6;
-  map.panBy([p.x - b.width/2, p.y - ty], {animate:true});
+  const dx = p.x - b.width/2, dy = p.y - ty;
+  if(!hidden && !(center && Math.hypot(dx, dy) > 24)) return;   // 地図のピンを押したときは、隠れるときだけ動かす
+  if(!autoPan) autoPan = map.getCenter();
+  map.panBy([dx, dy], {animate:true});
 }
 /* 一覧の行にマウスを乗せたとき・キーボードで選んだとき、地図の対応するピンに輪を出す */
 function hoverPin(i){
@@ -3061,7 +3117,7 @@ function buildUI(){
     row.className='catrow'; row.dataset.v=i;
     row.innerHTML='<span class="sw" style="background:'+CAT_COLORS[i]+'"></span>'
       +'<span class="nm">'+esc(name)+(CAT_HINT[name] ? '<span class="hint">'+esc(CAT_HINT[name])+'</span>' : '')+'</span><span class="n"></span>'
-      +'<span class="solo">単独</span>';
+      +'<span class="solo">これだけ</span>';
     row.onclick=e=>{
       if(e.target.classList.contains('solo')){
         F.cat.clear(); F.cat.add(i);
@@ -3192,6 +3248,9 @@ function buildUI(){
   const nullCount = (()=>{let n=0; for(let i=0;i<N;i++) if(!hasYr[i]) n++; return n;})();
   $('#nullN').textContent=nullCount;
   $('#tgCatColor').onclick=()=>setCatMode(!CAT_MODE);
+  $('#lgClose').onclick=()=>toggleLegend(false);
+  L.DomEvent.disableClickPropagation($('#legendBox')); L.DomEvent.disableScrollPropagation($('#legendBox'));
+  document.addEventListener('click', e=>{ if(!e.target.closest('#legendBox,#lgBtn')) toggleLegend(false); });
   if(ADMIN){ $('#lgPhoto').textContent='撮影済み（自分の写真あり）'; $('#lgVisit').textContent='「行った」の記録あり、または撮影済み'; }
   else $('#lgPhoto').textContent=LBL.photo_caption+'の写真あり';
   $('#lgLive').textContent=(LIVING.short||'現役稼働')+'（ときやどが利用を確認した物件）';
@@ -3357,6 +3416,7 @@ function buildUI(){
       if(!$('#about').hidden){ closeAbout(); return; }
       if(!$('#zukan').hidden){ closeZukan(); return; }
       if(!$('#saved').hidden){ closeSaved(); return; }
+      if(!$('#legendBox').hidden){ toggleLegend(false); return; }
       if(NEAR.picking){ cancelPick(); return; }
       if(document.body.classList.contains('fopen')){ setFilterOpen(false); return; }
     }
@@ -4096,6 +4156,8 @@ function openCard(i, opts){
     const f=$('#filters'), st=SHEET.state(f);
     SHEET.to(f, st==='max' ? 'max' : 'mid');
     watchReveal();
+    // 一覧・検索・周辺などから開いたときは中央付近へ。地図の印を押して開いたとき（map）は隠れるときだけ
+    revealCenter = !['map', 'url'].includes(cardFrom);
     revealPin(i);
   }
   setSelected(i);
@@ -4277,19 +4339,20 @@ function drawCard(r, ci){
     + enHtml(r.id)
     +'<div class="saverow" id="saveBox"></div>'
     + (pageUrl ? plink('morebtn', 'card_detail', '詳しく見る →') : '')
+    // 現地で使う人のために、地図アプリは名称・所在地のすぐ近くに
+    + (ci2>=0 && isFinite(lat[ci2]) ? '<a class="obtn mapapp" href="'+mapsUrl(ci2)+'" target="_blank" rel="noopener">地図アプリで開く ↗</a>' : '')
     // 2. 見どころ
     + hlSec
     // 3. 見学・利用
     + useSec
-    // 4. 行き方・記録（共有のボタンは物件ページだけ。物件ページが無い版ではカードに出す）
-    +'<section class="cs"><h3>'+(pageUrl ? '行き方・記録' : '行き方・記録・共有')+'</h3>'
-      + (i0>=0 && isFinite(lat[i0]) ? '<a class="obtn" href="'+mapsUrl(i0)+'" target="_blank" rel="noopener">地図アプリで開く ↗</a>' : '')
+    // 4. 訪問の記録（共有のボタンは物件ページだけ。物件ページが無い版ではカードに出す）
+    +'<section class="cs"><h3>'+(pageUrl ? '訪問の記録' : '訪問の記録・共有')+'</h3>'
       +'<div class="visit" id="visitBox"></div>'
       + (pageUrl ? '' : '<div class="share"><button type="button" class="obtn copy" id="copyLink">'+COPY_LABEL+'</button>'
         +'<a class="obtn xshare" id="xShare" href="'+esc(xShareUrl(r))+'" target="_blank" rel="noopener">𝕏 でシェア</a></div>' + snsHtml(r))
     +'</section>'
     // 5. 基本データ・出典: カードは物件ページへの予告なので、表は物件ページに任せて1行のリンクだけ
-    + (pageUrl ? '<section class="cs factslink">'+plink('readmore', 'card_facts', '基本データ・出典は詳細ページへ →')+'</section>'
+    + (pageUrl ? ''
     : '<section class="cs"><h3>基本データ</h3><div class="facts">'+facts+'</div>'
       +'<p class="srcline">出典：文化庁 国指定文化財等データベース'
       +(r.url?'　<a href="'+esc(r.url)+'" target="_blank" rel="noopener">文化庁の詳細ページ ↗</a>':'')+'</p>'
@@ -4300,7 +4363,8 @@ function drawCard(r, ci){
     // 管理モード: 撮影の目安・自分の写真の一覧
     + shotHtml(i0)
     + (pageUrl ? '' : mineHtml(r.id))
-    + (pageUrl ? plink('pagelink', 'card_bottom', 'この物件のページを開く →') : '')
+    // 物件ページへの入口は「詳しく見る」「解説の全文を読む」と、この末尾の1つ（GA4 の link_location: card_page）
+    + (pageUrl ? plink('pagelink', 'card_page', '詳細ページ（基本データ・出典）を開く →') : '')
     +'</div>';
   galBase = gal.length;          // ここから後ろに「訪問の写真」を足す
   drawSlide();
@@ -4469,10 +4533,9 @@ function renderSaved(){
     closeSaved();
     if(mode!=='map') setMode('map');
     closeCard();
-    setMine(6);
+    F.mine=6; syncMineButtons(); applyFilters();   // 絞り込みを先に済ませてから、その範囲に地図を合わせる
     $('#welcome').hidden=true; setPaneView('list');
-    const pts=list.filter(i=>isFinite(lat[i])).map(i=>[lat[i], lng[i]]);
-    if(pts.length) map.fitBounds(pts, Object.assign(fitPad(50), {maxZoom:15, animate:false}));
+    fitResults();   // 検索と同じく、見えている地図の範囲（ボタンの列を除く）に収める
   };
 }
 // 物件ページなど別のタブで保存したら、こちらにも反映する
