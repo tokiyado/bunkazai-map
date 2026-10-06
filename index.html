@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 08:49） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 10:46） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -102,6 +102,7 @@ body.nophoto #tileBtn{display:none}
 /* 検索窓（パソコンはヘッダーの中、スマホは地図の上に浮かせる） */
 #searchBox{margin:0; position:relative}
 #searchBox h3, #searchBox .pool{display:none}
+#qForm{margin:0}
 #searchBox .sugg{position:absolute; left:0; right:0; top:100%; z-index:20; box-shadow:0 6px 18px rgba(0,0,0,.18)}
 #q::placeholder{color:var(--dim2); opacity:.75}
 /* 入力欄を押したときだけ出す入力例 */
@@ -456,6 +457,10 @@ select:focus{border-color:var(--line2)}
 .res-head h2:focus{outline:none}
 .res-head h2{font-family:var(--font-head); font-size:18px; font-weight:600; letter-spacing:.04em}
 .res-n{font-size:12px; color:var(--dim2); font-variant-numeric:tabular-nums}
+.actconds{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px}
+.actconds button{display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 6px 0 12px; border:1px solid var(--line2); border-radius:17px;
+  background:var(--input-bg); color:var(--fg); font-size:12.5px; cursor:pointer}
+.actconds button .x{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--hover2); color:var(--dim); font-size:13px}
 .res-note{margin:0 0 8px; font-size:11.5px; color:var(--dim2)}
 #resList{list-style:none; margin:0; padding:0; border-top:1px solid var(--line)}
 #resList li{border-bottom:1px solid var(--line)}
@@ -1127,7 +1132,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
         <div id="searchSlotPane">
           <div class="fg" id="searchBox">
             <h3>場所・名称で探す</h3>
-            <input type="search" id="q" placeholder="地名・建物名で探す" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg" aria-label="地名・建物名で探す" aria-describedby="qHint">
+            <form id="qForm" action="#" role="search" onsubmit="return false"><input type="search" enterkeyhint="search" id="q" placeholder="地名・建物名で探す" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg" aria-label="地名・建物名で探す" aria-describedby="qHint"></form>
             <div class="sugg" id="sugg" role="listbox" hidden></div>
             <div class="qhint" id="qHint" hidden>例：尾鷲、旅館、銀行</div>
             <div class="pool" id="poolQ"></div>
@@ -1240,6 +1245,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
         <div id="paneBack" hidden><button type="button" id="backBtn"><span aria-hidden="true">←</span> <span id="backLabel">一覧に戻る</span></button></div>
         <section id="resultList" hidden aria-labelledby="resTitle">
           <div class="res-head"><h2 id="resTitle" tabindex="-1">この範囲の文化財</h2><span class="res-n" id="resN"></span></div>
+          <div class="actconds" id="actConds" hidden></div>
           <p class="res-note" id="resNote"></p>
           <ol id="resList"></ol>
           <button type="button" class="linkbtn" id="resMore" hidden>さらに表示</button>
@@ -1344,7 +1350,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-06 08:49", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-06 10:46", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1462,7 +1468,7 @@ let PRESENT_TYPES = new Set();
    fetch は HTML をダブルクリックで開いた（file://）ときにブロックされるが、
    script タグの読み込みは file:// でも通るため。中身は data/*.json と同一
    （build_index.py が data/js/ に書き出す）。 */
-const DATA_VER = "c42edae28d";      // データの中身の指紋（作り直すと変わる。古いファイルを使わせないため）
+const DATA_VER = "ca5290108f";      // データの中身の指紋（作り直すと変わる。古いファイルを使わせないため）
 function loadScript(src){
   return new Promise((resolve, reject)=>{
     const s = document.createElement('script');
@@ -1554,7 +1560,16 @@ function prepare(){
   // 都道府県: 「栃木県・群馬県」のような複合値を成分に分解
   IDX.prefComp = IDX.prefs.map(p=>p.split('・').filter(Boolean));
   const uniq = new Set(); IDX.prefComp.forEach(a=>a.forEach(p=>uniq.add(p)));
-  IDX.prefOptions = [...uniq].sort((a,b)=>a.localeCompare(b,'ja'));
+  // 都道府県コード順（北海道→沖縄）
+  const PREF_ORDER = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県',
+    '新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
+    '鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+  const po = p => { const k=PREF_ORDER.indexOf(p); return k<0 ? 99 : k; };
+  IDX.prefOptions = [...uniq].sort((a,b)=>po(a)-po(b) || a.localeCompare(b,'ja'));
+  // 市区町村: 全国地方公共団体コード順（build_index.py の citySort。政令市の区もコード順）
+  IDX.cityOrder = IDX.cities.map((_,i)=>i).sort((a,b)=>{
+    const ka = IDX.citySort ? IDX.citySort[a] : IDX.cities[a], kb = IDX.citySort ? IDX.citySort[b] : IDX.cities[b];
+    return ka < kb ? -1 : ka > kb ? 1 : 0; });
   // 自分の写真がある物件
   MINE_FLAG = new Uint8Array(N); MINE_TOTAL = 0;
   if(MINE) for(let i=0;i<N;i++) if(MINE.byId[ids[i]]){ MINE_FLAG[i]=1; MINE_TOTAL++; }
@@ -2345,6 +2360,7 @@ function applyFilters(){
   $('#topcount').textContent = fmt(V)+' / '+fmt(N);
   $('#fBtnN').textContent = V<N ? '絞込中' : '';
   updatePaneTabs();
+  renderActConds();
   $('#resetAll').hidden = !(V<N || F.qRaw);
   if(booted){
     // 初回のおすすめ（ようこそ）と検索結果は同時に出さない。条件を変えたら結果の一覧に切り替える
@@ -2539,18 +2555,95 @@ function pickSuggestion(k){
   if(!s) return;
   $('#sugg').hidden=true;
   if(s.type==='city'){
+    // 市区町村で絞る（検索の文字は残さない。絞り込みは結果の一覧の上の「地域：…」で見えて、解除できる）
     F.city=s.i; F.pref=s.pref || '';
-    F.q=''; F.qRaw=''; $('#q').value=s.name;
+    F.q=''; F.qRaw=''; $('#q').value='';
     $('#prefSel').value=F.pref; buildCityOptions();
-    applyFilters(); showCityWhere(); fitVisible();
-    showToast(s.name+'（'+s.pref+'） '+s.n+'件 ・ '+whereText(s.i), 5000);
+    applyFilters(); showCityWhere();
+    showSearchResult(s.name+'（'+s.pref+'）');
   } else if(s.type==='pref'){
     F.pref=s.name; F.city=-1; F.q=''; F.qRaw=''; $('#q').value='';
     $('#prefSel').value=F.pref; buildCityOptions();
-    applyFilters(); showCityWhere(); fitVisible();
+    applyFilters(); showCityWhere();
+    showSearchResult(s.name);
   } else {
-    F.qRaw=s.q; F.q=s.q.toLowerCase(); applyFilters();
+    F.qRaw=s.q; F.q=s.q.toLowerCase(); $('#q').value=s.q;
+    applyFilters();
+    showSearchResult('「'+s.q+'」');
   }
+}
+function fitAfterArea(){
+  if(MOBILE.matches && paneView==='cond'){ pendingFit = true; return; }   // 条件の画面を閉じたときに合わせる
+  fitResults();
+}
+/* 地域を選んだら検索の文字と合わず 0件になったとき: 検索の文字を外して、そのことを知らせる */
+function dropConflictingQuery(){
+  if(!F.qRaw || lastVisible.length) return;
+  const q=F.qRaw;
+  F.q=''; F.qRaw=''; $('#q').value='';
+  applyFilters();
+  showToast('選んだ地域に合わないため、検索「'+q+'」を外しました', 4000);
+}
+/* 検索を確定（Enter・キーボードの「検索」）。市区町村・都道府県の名前と一致すればその地域、そうでなければ名称・所在地から探す */
+let lastCommit = 0;
+function commitSearch(){
+  if(performance.now() - lastCommit < 400) return;        // Enter と送信の二重実行を防ぐ
+  lastCommit = performance.now();
+  const q=$('#q').value.trim();
+  if(!q){ $('#sugg').hidden=true; $('#q').blur(); return; }
+  const norm = x => x.replace(/\s+/g,'');
+  const qq = norm(q);
+  let ci=-1, best=0;
+  IDX.cities.forEach((full,i)=>{
+    const pref=IDX.prefOptions.find(p=>full.startsWith(p)) || '';
+    const name=full.slice(pref.length);
+    if((name===qq || full===qq) && CITY_N[i]>best){ ci=i; best=CITY_N[i]; }
+  });
+  if(ci>=0){
+    const full=IDX.cities[ci], pref=IDX.prefOptions.find(p=>full.startsWith(p)) || '';
+    suggList=[{type:'city', i:ci, name:full.slice(pref.length), pref, n:CITY_N[ci]}]; pickSuggestion(0); return;
+  }
+  const pf = IDX.prefOptions.find(p=>p===qq || p.replace(/[都道府県]$/,'')===qq);
+  if(pf){ suggList=[{type:'pref', name:pf}]; pickSuggestion(0); return; }
+  suggList=[{type:'text', q}]; pickSuggestion(0);
+}
+/* 検索・地域で絞ったあと、合った物件すべてが「見えている地図の範囲」に入るように地図を合わせる。
+   スマホはシートを最小（見出しだけ）にし、上は検索窓とチップの帯、下はシートと出典表示、右下の ◎ ボタンを避ける */
+let pendingFit = false;
+let qPrev = null;   // 検索窓に入る前のシートの高さ（入力を終えたら戻す。検索を確定したときは戻さない）
+function fitResults(){
+  const pts=lastVisible.filter(i=>markers[i]).map(i=>[lat[i], lng[i]]);
+  if(!pts.length) return;
+  if(mode!=='map') setMode('map');
+  if(!MOBILE.matches){ fitVisible(); return; }
+  const f=$('#filters');
+  qPrev = null;            // このあと検索窓から離れても、シートを元の高さに戻さない
+  SHEET.to(f, 'min');
+  const b=mapViewBox(SHEET.px(f, 'min'));
+  const lb=$('#locBtn'), zc=document.querySelector('.leaflet-control-zoom');
+  const right = (lb ? lb.getBoundingClientRect().width + 12 : 12) + 14;   // ◎ ボタンの列
+  const left = (zc ? zc.getBoundingClientRect().width + 10 : 0) + 14;     // ＋－ボタンの列
+  const M = 24;   // まとまりの丸の半径ぶん（丸の中心が端に来ても丸ごと見えるように）
+  map.fitBounds(pts, {paddingTopLeft:[left, Math.round(b.top + M)], paddingBottomRight:[right, Math.round(b.height - b.bottom + M)],
+                      maxZoom:16, animate:false});
+}
+/* 検索・地域を選んだあと: キーボードを閉じ、合った物件がすべて入る範囲へ地図を動かす。1件だけならその物件を開く */
+function showSearchResult(label){
+  $('#q').blur();
+  $('#welcome').hidden=true;
+  if(paneView!=='list' && paneView!=='detail') setPaneView('list');
+  const vis=lastVisible.filter(i=>markers[i]);
+  if(!lastVisible.length){ showToast(label+'に合う文化財は見つかりませんでした', 3500); return; }
+  if(lastVisible.length===1){
+    const i=lastVisible[0];
+    if(markers[i]) map.setView([lat[i], lng[i]], Math.max(map.getZoom(), 16), {animate:false});
+    openCard(i, {from:'search'});
+    return;
+  }
+  if(paneView==='detail') closeCard();
+  scroller().scrollTop=0;
+  if(vis.length) fitResults();
+  showToast(label+'：'+lastVisible.length.toLocaleString()+'件', 2500);
 }
 
 /* ================= 撮影の進み具合と、撮影の目安 ================= */
@@ -2717,12 +2810,15 @@ function closePlaceList(){
 function buildCityOptions(){
   const sel=$('#citySel');
   const groups=new Map();
-  IDX.cities.forEach((c,i)=>{
+  IDX.prefOptions.forEach(p=>{ if(!F.pref || p===F.pref) groups.set(p, []); });   // 県の並びは都道府県コード順
+  IDX.cityOrder.forEach(i=>{                                                         // 市区町村は団体コード順
+    const c=IDX.cities[i];
     const p=IDX.prefOptions.find(x=>c.startsWith(x)) || 'その他';
     if(F.pref && p!==F.pref) return;
     if(!groups.has(p)) groups.set(p,[]);
-    groups.set(p, groups.get(p).concat([[i, c.slice(p.length) || c]]));
+    groups.get(p).push([i, c.slice(p.length) || c]);
   });
+  for(const [p, list] of [...groups]) if(!list.length) groups.delete(p);
   let html='<option value="">すべて</option>';
   for(const [p, list] of groups){
     html += '<optgroup label="'+esc(p)+'">'
@@ -2762,6 +2858,13 @@ function setPaneView(v){
 }
 /* 条件の画面を閉じて、結果（詳細から来たときは詳細）に戻る */
 function leaveCond(){
+  if(pendingFit){
+    pendingFit = false;
+    if(!$('#card').classList.contains('hidden')) closeCard();
+    $('#welcome').hidden=true; setPaneView('list'); scroller().scrollTop=0;
+    fitResults();
+    return;
+  }
   if(condFrom==='detail' && !$('#card').classList.contains('hidden')) setPaneView('detail');
   else { $('#welcome').hidden=true; setPaneView('list'); }
   if(MOBILE.matches) SHEET.to($('#filters'), 'mid');
@@ -2781,7 +2884,7 @@ function updateSheetHead(){
   b.hidden = !(paneView==='detail' || paneView==='cond' || (paneView==='list' && placeOpen()));
   b.setAttribute('aria-label', paneView==='cond' ? '結果に戻る' : paneView==='list' ? '結果の一覧に戻る' : paneFrom==='intro' ? 'はじめにに戻る' : '一覧に戻る');
   // 地図の上の「条件」ボタンに、絞り込んでいる条件の数
-  const n = (F.pref||F.city>=0 ? 1 : 0) + moreActive();
+  const n = (F.pref||F.city>=0 ? 1 : 0) + (F.qRaw ? 1 : 0) + moreActive();
   const cn=$('#condN'); if(cn) cn.textContent = n ? n : '';
 }
 function scheduleList(ms){ clearTimeout(listTimer); listTimer = setTimeout(()=>{ if(paneView==='list') renderList(); updateWelcomeCount(); }, ms==null ? 150 : ms); }
@@ -2816,8 +2919,10 @@ function renderList(keepScroll){
       : 'この範囲には、条件に合う文化財がありません（全体で '+lastVisible.length.toLocaleString()+' 件）。'
         + '<div class="acts"><button type="button" class="linkbtn" data-act="out">地図を広げる</button><button type="button" class="linkbtn" data-act="japan">日本全体を表示</button>'
         + (lastVisible.length < N || F.qRaw ? '<button type="button" class="linkbtn" data-act="reset">条件をすべて解除</button>' : '') + '</div>';
+    if(lastVisible.length && lastVisible.length < N)
+      empty.innerHTML = empty.innerHTML.replace('<div class="acts">', '<div class="acts"><button type="button" class="linkbtn" data-act="fit">条件に合う '+lastVisible.length.toLocaleString()+' 件の場所へ移動</button>');
     empty.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
-      if(b.dataset.act==='reset') resetFilters(); else if(b.dataset.act==='out') map.zoomOut(2); else fitJapan(false); });
+      if(b.dataset.act==='reset') resetFilters(); else if(b.dataset.act==='fit') fitResults(); else if(b.dataset.act==='out') map.zoomOut(2); else fitJapan(false); });
     updateSheetHead();
     return;
   }
@@ -2875,6 +2980,21 @@ function hoverPin(i){
   if(i<0 || !map || !isFinite(lat[i])) return;
   hoverRing = L.circleMarker([lat[i],lng[i]], {pane:'selPane', radius:13, weight:3, color:PIN_MAIN,
     fill:true, fillOpacity:.12, interactive:false}).addTo(map);
+}
+/* 結果の一覧の上: いま効いている「検索」「地域」の条件（見えないまま残らないように。× で解除） */
+function renderActConds(){
+  const box=$('#actConds'); if(!box) return;
+  const items=[];
+  if(F.qRaw) items.push(['q', '検索：'+F.qRaw]);
+  if(F.city>=0) items.push(['area', '地域：'+IDX.cities[F.city]]);
+  else if(F.pref) items.push(['area', '地域：'+F.pref]);
+  box.hidden = !items.length;
+  box.innerHTML = items.map(([k,t])=>'<button type="button" data-k="'+k+'" aria-label="'+esc(t)+'の条件を解除">'+esc(t)+'<span class="x" aria-hidden="true">×</span></button>').join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    if(b.dataset.k==='q'){ F.q=''; F.qRaw=''; $('#q').value=''; }
+    else { F.pref=''; F.city=-1; $('#prefSel').value=''; buildCityOptions(); }
+    applyFilters(); if(typeof showCityWhere==='function') showCityWhere();
+  });
 }
 function updatePaneTabs(){
   const pv = (id, t) => { const el=$('#'+id); if(el) el.textContent = t; };
@@ -3037,7 +3157,9 @@ function buildUI(){
     F.pref=e.target.value;
     if(F.city>=0 && F.pref && !IDX.cities[F.city].startsWith(F.pref)) F.city=-1;   // 県を変えたら市区町村は外す
     buildCityOptions();
-    scheduleFilter(0);
+    applyFilters();
+    dropConflictingQuery();
+    if(F.pref) fitAfterArea();
   };
 
   // 市区町村（都道府県ごとにまとめる。県を選んでいればその県だけ）
@@ -3049,8 +3171,9 @@ function buildUI(){
       if(p && F.pref && p!==F.pref){ F.pref=p; $('#prefSel').value=p; }   // 県をまたぐ指定は県側を合わせる
     }
     applyFilters();
+    dropConflictingQuery();
     showCityWhere();
-    if(F.city>=0) fitVisible();
+    if(F.city>=0) fitAfterArea();
   };
   $('#cityFit').onclick=()=>fitVisible();
   $('#cityWide').onclick=()=>wideView();
@@ -3101,10 +3224,16 @@ function buildUI(){
   qEl.onkeydown=e=>{
     if(e.key==='ArrowDown'){ e.preventDefault(); moveSuggestion(1); }
     else if(e.key==='ArrowUp'){ e.preventDefault(); moveSuggestion(-1); }
-    else if(e.key==='Enter'){ e.preventDefault(); pickSuggestion(suggSel); }
+    else if(e.key==='Enter'){
+      if(e.isComposing || e.keyCode===229) return;     // 日本語の変換を確定する Enter は検索にしない
+      e.preventDefault();
+      if(suggSel>=0) pickSuggestion(suggSel); else commitSearch();
+    }
     else if(e.key==='Escape'){ $('#sugg').hidden=true; }
   };
   qEl.onfocus=()=>{ if(F.qRaw) buildSuggestions(F.qRaw); };
+  // iPhone のキーボードの「検索」「開く」は form の送信になる
+  $('#qForm').addEventListener('submit', e=>{ e.preventDefault(); commitSearch(); });
   document.addEventListener('click', e=>{
     if(!e.target.closest('#sugg') && e.target!==qEl) $('#sugg').hidden=true;
   });
@@ -3217,7 +3346,7 @@ function buildUI(){
   // 検索欄に入ったら候補が見えるように全体まで引き上げる
   // 検索窓はシートの外にあるので、入力中はシートを下げて候補を見やすく
   // （キーボードと候補が見えるように、入力中はシートを予告の高さまで下げ、入力を終えたら元に戻す）
-  let qPrev=null;
+  qPrev=null;
   $('#q').addEventListener('focus', ()=>{ if(!MOBILE.matches) return; const f=$('#filters'); qPrev=SHEET.state(f); if(qPrev!=='min') SHEET.to(f,'min'); });
   $('#q').addEventListener('blur', ()=>{ if(!MOBILE.matches) return; setTimeout(()=>{ const f=$('#filters');
     if(document.activeElement!==$('#q') && SHEET.state(f)==='min' && qPrev && qPrev!=='min') SHEET.to(f, qPrev==='max' ? 'max' : 'mid'); qPrev=null; }, 250); });
