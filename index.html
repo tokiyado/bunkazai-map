@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 15:25） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-06 20:11） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -70,6 +70,8 @@
   background:var(--pin-main); color:#fff; font-size:8.5px; font-weight:700; box-shadow:0 0 0 1.5px #fff, 0 0 0 2.5px rgba(20,20,20,.55)}
 button.toggle{border:0; background:transparent; padding:0; font:inherit; color:inherit; text-align:left; cursor:pointer; min-height:36px}
 :focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+/* 地図そのもののフォーカスの枠は、外側（左の列との境目）に深緑の線として出てしまうので、内側の目立たない線にする */
+.leaflet-container:focus-visible{outline:2px solid var(--line2); outline-offset:-2px}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%}
 body{
@@ -458,8 +460,13 @@ select:focus{border-color:var(--line2)}
 #paneTop .summary .sumt{color:var(--dim2); font-size:11.5px}
 #paneTop .summary .suml{font-size:12.5px; color:var(--dim); margin-right:2px}
 #paneTop .reset{margin-left:auto; border:0; background:transparent; color:var(--brand); font-size:12px; cursor:pointer; padding:4px 0; text-decoration:underline; text-underline-offset:3px}
-#paneBack{position:sticky; top:0; z-index:5; background:var(--panel); border-bottom:1px solid var(--line); margin:0 -20px; padding:0 20px}
-#backBtn{display:flex; align-items:center; gap:6px; min-height:44px; border:0; background:transparent; color:var(--fg); font-size:13px; cursor:pointer; padding:0}
+#paneBack{position:sticky; top:0; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--panel); border-bottom:1px solid var(--line); margin:0 -20px; padding:0 20px}
+#paneBack[hidden]{display:none}
+#backBtn{display:flex; align-items:center; gap:6px; min-height:40px; border:0; background:transparent; color:var(--fg); font-size:13px; cursor:pointer; padding:0}
+#wideBtn{display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:0 12px; border:1px solid var(--line2); border-radius:16px;
+  background:transparent; color:var(--fg2); font-size:12px; cursor:pointer; white-space:nowrap}
+#wideBtn:hover{border-color:var(--fg); color:var(--fg)}
 #backBtn:hover #backLabel{text-decoration:underline; text-underline-offset:3px}
 /* 結果の一覧 */
 .res-head{display:flex; align-items:baseline; gap:0; margin:18px 0 2px}
@@ -497,10 +504,34 @@ select:focus{border-color:var(--line2)}
 .wlist:hover{border-color:var(--fg)}
 @media (min-width: 769px){
   #fBtn,#fHead,#scrim{display:none!important}
-  #filters{width:400px; flex:0 0 400px; padding:0; display:flex; flex-direction:column; overflow:hidden}
+  /* 左の列の幅。探索中は約36%、物件を選んだら約48%（大きな画面では上限で止める）。
+     切り替えは「物件を選んだ／一覧に戻った」の操作だけ（setPcDetail）。「地図を広げる」で探索中の幅に戻せる */
+  #filters{--pane-w:clamp(min(400px, 50vw), 36vw, 600px); width:var(--pane-w); flex:0 0 var(--pane-w);
+    padding:0; display:flex; flex-direction:column; overflow:hidden}
+  /* 物件を選んだ後の幅は内容で変える（開いた時点の表紙の写真で決め、写真送りでは変えない）
+     写真なし 約480〜560px／横写真 約560〜680px／縦写真 約640〜720px（画面が狭ければその分だけ狭く） */
+  body.pc-detail:not(.pc-mapwide)[data-pcm="none"] #filters{--pane-w:clamp(min(460px, 56vw), 40vw, 560px)}
+  body.pc-detail:not(.pc-mapwide)[data-pcm="land"] #filters{--pane-w:clamp(min(520px, 56vw), 46vw, 680px)}
+  body.pc-detail:not(.pc-mapwide)[data-pcm="port"] #filters{--pane-w:clamp(min(560px, 58vw), 50vw, 720px)}
   #paneTop{flex:0 0 auto; max-height:62%; overflow-y:auto; padding:16px 20px 12px; border-bottom:1px solid var(--line)}
   #paneBody{flex:1 1 auto; overflow-y:auto; padding:0 20px 40px; overscroll-behavior:contain}
-  #searchSlotPane{margin-bottom:10px}
+  #searchSlotPane{margin-bottom:10px; display:flex; align-items:flex-start; gap:8px}
+  #searchSlotPane #searchBox{flex:1 1 auto; min-width:0; order:1}
+  #condBtnPc{display:none; order:2; flex:0 0 auto; align-items:center; gap:6px; height:44px; padding:0 16px; border:1px solid var(--line2);
+    border-radius:22px; background:var(--input-bg); color:var(--fg); font-size:13.5px; cursor:pointer}
+  #condBtnPc[aria-expanded="true"]{border-color:var(--fg)}
+  #condBtnPc .n{min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--brand); color:var(--brand-ink); font-size:11px; line-height:18px; text-align:center}
+  #condBtnPc .n:empty{display:none}
+  #condSumPc{display:none; margin:-2px 0 0; font-size:12px; color:var(--dim); line-height:1.6}
+  /* 物件を選んだ後: 上は検索欄と「条件」ボタン（と、条件の短い要約）だけ。条件は「条件」で開く。値はそのまま */
+  body.pc-detail #condBtnPc{display:inline-flex}
+  body.pc-detail #condSumPc:not([hidden]){display:block}
+  body.pc-detail:not(.pc-cond-open) #chipSlotPane, body.pc-detail:not(.pc-cond-open) .ptabs,
+  body.pc-detail:not(.pc-cond-open) .psec, body.pc-detail:not(.pc-cond-open) #paneTop .summary,
+  body.pc-detail:not(.pc-cond-open) #mineBox{display:none!important}
+  body.pc-detail #paneTop{padding:12px 20px 10px}
+  body.pc-detail:not(.pc-cond-open) #searchSlotPane{margin-bottom:0}
+  body.pc-detail.pc-cond-open #condSumPc{display:none}
   #searchSlotPane #q{width:100%; height:44px; border-radius:22px; padding:0 18px; font-size:14px; border:1px solid var(--line2)}
   #searchSlotPane #q:focus{border-color:var(--fg); outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 25%, transparent)}
   /* 絞り込みのチップは地図の上ではなく左の列に */
@@ -513,7 +544,78 @@ select:focus{border-color:var(--line2)}
   body.has-mfloat #yearOverlay{top:16px}
   #paneBody #card{margin:0 -20px}
   #paneBody #card .body{padding:14px 20px 24px}
+  /* PC の詳細: 上に分類・物件名・ふりがな、中段に写真と「所在地・年代・操作」（縦写真で幅があれば横並び）、下に見どころなど */
+  #paneBody #card{container-type:inline-size}
+  #paneBody #card .body.chead{padding:14px 20px 10px}
+  #card .chead .kicker{margin-top:0}
+  #card .chead h2{display:flex; align-items:flex-start; gap:8px; font-size:24px; line-height:1.4; overflow-wrap:anywhere}
+  #card .chead h2 .hpin{flex:0 0 14px; width:14px; height:20px; margin-top:.3em}
+  #card .chead .kana{margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:40em}
+  #card .chead .kana.long{cursor:pointer}
+  #card .chead .kana.open{white-space:normal}
+  #card .cmid{display:grid; grid-template-columns:minmax(0,1fr); gap:12px 22px; padding:0 20px 6px; align-items:start}
+  #card .phcol{min-width:0}
+  #paneBody #card .ph{width:100%; aspect-ratio:auto; background:var(--tile); border-radius:3px; overflow:hidden}
+  #paneBody #card .ph .slide{background:transparent}
+  #paneBody #card .ph .strip.multi .slide{flex-basis:100%}
+  #paneBody #card .ph .slide img{object-fit:contain; object-position:50% 50%; cursor:zoom-in}
+  #paneBody #card .ph .slide .bg, #paneBody #card .ph .pcap, #paneBody #card .ph .pcount, #paneBody #card .ph .nav{display:none}
+  #paneBody #card .ph.nophoto{background:transparent; border-radius:0}
+  #paneBody #card .ph.nophoto .dblink{padding:0}
+  #card .phbar{display:flex; align-items:center; gap:8px; min-height:30px; margin-top:4px; font-size:11.5px; color:var(--dim)}
+  #card .phbar .cap{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  #card .phbar .c{font-variant-numeric:tabular-nums; min-width:3.2em; text-align:center}
+  #card .phbar button{width:32px; height:30px; border:1px solid var(--line); border-radius:3px; background:transparent; color:var(--fg); font-size:16px; cursor:pointer}
+  #card .phbar button:hover{border-color:var(--line2)}
+  #card .infocol{min-width:0}
+  /* 所在地と年代: 1列のときは1行に並べる（縦の幅を写真に回す）。縦写真の横並び・狭い幅では2行 */
+  #card .facts2{display:grid; grid-template-columns:auto auto auto 1fr; gap:4px 12px; margin:0 0 10px; font-size:14px}
+  #card .facts2 dd{margin-right:12px}
+  #card .facts2 dt{color:var(--dim); font-size:12px; padding-top:2px}
+  #card .facts2 dd{margin:0; color:var(--fg)}
+  #card .infocol .live{margin:0 0 10px; max-width:520px}
+  #card .infocol .ph.nophoto{margin:0 0 10px}
+  /* 操作: 「閲覧・移動」と「保存・記録」を近くにまとめる。ボタンは余った横幅いっぱいに伸ばさない */
+  #card .cacts{display:flex; flex-direction:column; gap:10px; margin:0; max-width:520px}
+  #card .cacts .g{display:flex; flex-wrap:wrap; gap:8px}
+  #card .cacts .g + .g{padding-top:10px; border-top:1px solid var(--line)}
+  #card .cacts .morebtn{flex:0 1 auto; min-width:150px; margin:0; min-height:42px; padding:0 22px; display:inline-flex; align-items:center; justify-content:center}
+  #card .cacts .obtn.mapapp{display:inline-flex; width:auto; margin:0; min-height:42px}
+  #card .cacts .saverow{display:contents}
+  #card .cacts .savenote{display:none}
+  #card .cacts .sbtn{min-height:42px}
+  #card .vquick{display:inline-flex; align-items:center; gap:6px; min-height:42px; padding:0 16px; border:1px solid var(--line2); border-radius:20px;
+    background:transparent; color:var(--fg); font-size:13.5px; cursor:pointer; white-space:nowrap}
+  #card .vquick[aria-pressed="true"]{border-color:var(--fg); font-weight:600}
+  #card .cacts .anote{margin:0; font-size:11.5px; color:var(--dim2)}
+  #card .cs.visitsec.unvisited{display:none}
+  #paneBody #card .body .cs, #paneBody #card .body > .en{max-width:40em}
+  /* 縦写真で、詳細の中に十分な幅があるとき: 写真の右に所在地・年代・操作 */
+  @container (max-width: 459px){ #card .facts2{grid-template-columns:auto 1fr} #card .facts2 dd{margin-right:0} }
+  @container (min-width: 600px){
+    body[data-pcm="port"] #card .cmid.has-photo .facts2{grid-template-columns:auto 1fr}
+    body[data-pcm="port"] #card .cmid.has-photo .facts2 dd{margin-right:0}
+    body[data-pcm="port"] #card .cmid.has-photo{grid-template-columns:auto minmax(230px, 1fr)}
+    body[data-pcm="port"] #card .cmid.has-photo .cacts .g{flex-direction:column; align-items:stretch}
+    body[data-pcm="port"] #card .cmid.has-photo .cacts .morebtn, body[data-pcm="port"] #card .cmid.has-photo .cacts .obtn.mapapp,
+    body[data-pcm="port"] #card .cmid.has-photo .cacts .sbtn, body[data-pcm="port"] #card .cmid.has-photo .vquick{width:100%; justify-content:center}
+  }
+  #card .ph .zoomhint{display:none}
 }
+/* 選んだ物件のピン: 選んだ瞬間だけ、周りに薄い輪が一度広がる（繰り返さない。動きを減らす設定では出さない） */
+.sel-mark .sel-ring{position:absolute; left:-6px; top:-6px; width:12px; height:12px; border-radius:50%; border:2px solid var(--pin-main);
+  opacity:0; pointer-events:none; animation:selRing .9s ease-out 1}
+@keyframes selRing{0%{transform:scale(1); opacity:.75} 100%{transform:scale(5.5); opacity:0}}
+@media (prefers-reduced-motion: reduce){ .sel-mark .sel-ring{display:none} }
+/* 写真の拡大表示（PC） */
+#phView{position:fixed; inset:0; z-index:3000; background:rgba(10,10,12,.92); display:flex; align-items:center; justify-content:center}
+#phView[hidden]{display:none}
+#phView img{max-width:calc(100vw - 120px); max-height:calc(100vh - 90px); object-fit:contain; box-shadow:0 4px 30px rgba(0,0,0,.5)}
+#phView button{position:absolute; border:0; background:rgba(255,255,255,.12); color:#fff; cursor:pointer; border-radius:50%}
+#phView .x{top:16px; right:16px; width:44px; height:44px; font-size:22px}
+#phView .pv{left:16px; top:50%; width:48px; height:48px; margin-top:-24px; font-size:26px}
+#phView .nx{right:16px; top:50%; width:48px; height:48px; margin-top:-24px; font-size:26px}
+#phView .cap{position:absolute; bottom:16px; left:0; right:0; text-align:center; color:#ddd; font-size:12.5px}
 /* ようこそと物件の詳細は左の列（スマホは下のシート）の中に置く。地図の上には重ねない */
 #paneBody #welcome, #paneBody #card{position:static; width:auto; max-width:none; max-height:none; overflow:visible; z-index:auto;
   background:transparent; border:0; border-radius:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; padding:0}
@@ -537,9 +639,6 @@ select:focus{border-color:var(--line2)}
 #sheetHead, #condBtn, #condDone{display:none}
 input[type=search]{-webkit-appearance:none; appearance:none}
 input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
-@media (min-width: 769px) and (max-width: 1100px){
-  #filters{width:360px; flex-basis:360px}
-}
 
 /* ---- 地図の上の絞り込みバー ---- */
 /* パソコン: 右に物件カード・ようこそが出ている間は、見えている地図の範囲（右のパネルの分を除く）の中央、
@@ -1141,6 +1240,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
       <div id="fHead"><span>フィルタ</span><button id="fClose" aria-label="フィルタを閉じる">×</button></div>
       <div class="pane-top" id="paneTop">
         <div id="searchSlotPane">
+          <button type="button" id="condBtnPc" aria-expanded="false" aria-controls="paneTop">条件<span class="n" id="condNPc"></span></button>
           <div class="fg" id="searchBox">
             <h3>場所・名称で探す</h3>
             <form id="qForm" action="#" role="search" onsubmit="return false"><input type="search" enterkeyhint="search" id="q" placeholder="地名・文化財名で探す" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugg" aria-label="地名・文化財名で探す" aria-describedby="qHint"></form>
@@ -1149,6 +1249,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
             <div class="pool" id="poolQ"></div>
           </div>
         </div>
+        <p id="condSumPc" hidden></p>
         <div id="chipSlotPane"></div>
         <div class="ptabs" role="group" aria-label="条件">
           <button type="button" class="ptab" data-sec="secArea" aria-expanded="false" aria-controls="secArea"><span class="pl">地域</span><span class="pv" id="pvArea"></span><span class="car" aria-hidden="true"></span></button>
@@ -1240,7 +1341,8 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
           <button type="button" class="nb-btn sub" id="nearPick">現在地の代わりに、地図を押して基点を置く</button>
           <ol id="nearList" hidden></ol>
         </div>
-        <div id="paneBack" hidden><button type="button" id="backBtn"><span aria-hidden="true">←</span> <span id="backLabel">一覧に戻る</span></button></div>
+        <div id="paneBack" hidden><button type="button" id="backBtn"><span aria-hidden="true">←</span> <span id="backLabel">一覧へ戻る</span></button>
+          <button type="button" id="wideBtn" aria-pressed="false">地図を広げる</button></div>
         <section id="resultList" hidden aria-labelledby="resTitle">
           <div class="res-head"><h2 id="resTitle" tabindex="-1">この地図の範囲</h2><span class="res-n" id="resN"></span></div>
           <div class="actconds" id="actConds" hidden></div>
@@ -1286,6 +1388,12 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
             </ul>
             <button type="button" class="toggle" id="tgCatColor" role="switch" aria-checked="false"><span class="box"></span><span>地図の点を分類ごとの色で表示する</span></button>
   <div class="note">ふだんは1色で表示します。色分けしたときは、「条件 → 分類」の一覧の左の四角が色の見本です。</div>
+</div>
+<div id="phView" role="dialog" aria-modal="true" aria-label="写真の拡大表示" hidden>
+  <img alt="">
+  <button type="button" class="pv" aria-label="前の写真">‹</button><button type="button" class="nx" aria-label="次の写真">›</button>
+  <button type="button" class="x" aria-label="閉じる">×</button>
+  <div class="cap"></div>
 </div>
 <div id="saved" class="modal" hidden>
   <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="svTitle">
@@ -1361,7 +1469,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-06 15:25", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-06 20:11", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1372,6 +1480,7 @@ const PAGES_ON = true;
 /* 自分の写真の並び（表紙が先頭）。content/{ID}.md の cover / photos から build_html.py が作る。
    {物件ID: ["2023-10-07_140920.jpeg", …]}（撮影日_ファイル名） */
 const PHOTO_ORDER = {"00000773":["2023-08-24_142045.jpeg","2023-08-24_142051.jpeg"],"00009682":["2023-10-07_140806.jpeg","2023-10-07_140920.jpeg","2023-10-07_140902.jpeg"]};
+const PHOTO_AR = {"00000773_旧林療院本館/2023-08-24/142045.jpeg":1.3333,"00000773_旧林療院本館/2023-08-24/142051.jpeg":0.75,"00000808_ピーエス熊本センター（旧第一銀行熊本支店）/2023-10-06/172144.jpeg":1.3333,"00000808_ピーエス熊本センター（旧第一銀行熊本支店）/2023-10-06/172251.jpeg":1.3333,"00000825_旧林療院看護婦棟/2023-08-24/142225.jpeg":1.3333,"00000826_旧林療院レントゲン棟/2023-08-24/142002.jpeg":1.3333,"00001709_天狗総本店/2023-08-25/163702.jpeg":1.3333,"00001709_天狗総本店/2023-08-25/163719.jpeg":1.3333,"00002042_旧堀谷医院/2023-08-24/134351.jpeg":0.75,"00002042_旧堀谷医院/2023-08-24/134411.jpeg":0.75,"00006532_蒲酒造場主屋/2023-08-25/112158.jpeg":1.3333,"00009282_河合家別邸門及び塀/2023-08-25/112026.jpeg":1.3333,"00009282_河合家別邸門及び塀/2023-08-25/112044.jpeg":1.3333,"00009282_河合家別邸門及び塀/2023-08-25/112142.jpeg":1.3333,"00009682_髙木医院/2023-10-07/140806.jpeg":1.3333,"00009682_髙木医院/2023-10-07/140902.jpeg":0.75,"00009682_髙木医院/2023-10-07/140920.jpeg":1.3333,"00013469_西村家住宅店舗/2023-10-06/172746.jpeg":1.3333,"00013469_西村家住宅店舗/2023-10-06/172803.jpeg":1.3333,"00015294_旧飯田家住宅店舗兼主屋/2026-10-03/160718.jpg":1.3336,"00015294_旧飯田家住宅店舗兼主屋/2026-10-03/160720.jpg":0.7499,"00015294_旧飯田家住宅店舗兼主屋/2026-10-03/160804.jpg":1.3333};      // 自分の写真の縦横比 {写真のパス: 幅÷高さ}（build_html.py が向きを直した寸法で入れる）
 /* 今も使われている文化財（content/{ID}.md の living: true。自分で確認した物件だけ）。build_html.py が作る
    {label:"生きている文化財", filter:"今入れる文化財", items:{物件ID:{use, verified:"2026年9月確認", url, icon}}} */
 const LIVING = {"label":"生きている文化財","filter":"現役稼働の文化財","short":"現役稼働","accent":"#FFB800","items":{"00009682":{"use":"カフェ","verified":"2026年9月確認","url":"https://cafe-asanisimasa.com/"}}};
@@ -1949,6 +2058,12 @@ function saveView(){
   try{ const c=map.getCenter(); localStorage.setItem(VIEW_KEY, JSON.stringify({lat:+c.lat.toFixed(5), lng:+c.lng.toFixed(5), z:map.getZoom()})); }catch(_){}
 }
 /* 四島を収める。panelRight: このあと「ようこそ」が出る（パソコンは右のパネルの幅、スマホは下半分のシートを除く） */
+/* PC で見えている地図の範囲: 上下は地図の端から少し内側、下は出典表示の帯の上まで */
+function pcViewBox(){
+  const mr = map.getContainer().getBoundingClientRect();
+  const at = document.querySelector('.leaflet-control-attribution');
+  return {top: 14, bottom: mr.height - (at ? at.offsetHeight : 0) - 10, width: mr.width, height: mr.height};
+}
 /* スマホで「実際に見えている地図の範囲」（地図の中の座標）。
    上は検索窓とチップの帯の下端、下は出典表示の帯の上端（＝下のシートの高さ sheetH と出典の帯の高さで決まる） */
 function mapViewBox(sheetH){
@@ -2001,7 +2116,11 @@ function initialView(H){
     mapReady = true;
     map.on('moveend', saveView);
     map.on('moveend', ()=>{ resLimit = 50; scheduleList(); });
-    map.on('dragstart zoomstart', ()=>{ autoPan = null; });   // 利用者が地図を動かしたら、詳細を閉じても元に戻さない
+    map.on('dragstart zoomstart', ()=>{ autoPan = null; });
+    map.on('dragstart', ()=>{ pcUserMoved = true; });
+    map.getContainer().addEventListener('wheel', ()=>{ pcUserMoved = true; }, {passive:true});
+    map.on('dblclick', ()=>{ pcUserMoved = true; });
+    document.querySelectorAll('.leaflet-control-zoom a').forEach(a=>a.addEventListener('click', ()=>{ pcUserMoved = true; }));   // 利用者が地図を動かしたら、詳細を閉じても元に戻さない
     ['touchstart','mousedown','wheel'].forEach(t=>map.getContainer().addEventListener(t, ()=>{ userTouchedMap = true; revealCenter = false; }, {passive:true}));
     map.on('moveend', ()=>{
       if(MOBILE.matches && curId!=null && idIndex.has(curId) && !userTouchedMap && performance.now() < revealUntil){
@@ -2023,7 +2142,8 @@ function initialView(H){
   }
 }
 // ウィンドウサイズが変わったら地図の描画領域を追従させる
-window.addEventListener('resize', ()=>{ if(!map) return; map.invalidateSize(); if(ANIM.playing) drawDots(); });
+window.addEventListener('resize', ()=>{ if(!map) return; map.invalidateSize(); if(ANIM.playing) drawDots();
+  const ph=document.querySelector('#card .ph'), st=ph && ph.querySelector('.strip'); if(st && ph.dataset.ar) fitFrame(ph, st, +ph.dataset.ar); });
 
 /* ---- ピンの見た目 ----
    状態は色だけでなく形でも分ける（色覚の多様性・白黒印刷でも区別できるように）
@@ -2250,7 +2370,7 @@ function setSelected(i){
   updateLiveMarkers();
   if(i==null || i<0 || !map || !isFinite(lat[i])) return;
   const html = (LIVE_FLAG && LIVE_FLAG[i]) ? livePinHtml(i, true)
-    : '<span class="sel-mark" style="--pin:'+pinColor(i)+'">'+DROP_SVG
+    : '<span class="sel-mark" style="--pin:'+pinColor(i)+'"><span class="sel-ring"></span>'+DROP_SVG
       + '<span class="plabel">'+esc(names[i])+'</span></span>';
   selMarker = L.marker([lat[i], lng[i]], {
     icon: L.divIcon({className:'sel-pin', html, iconSize:[0,0], iconAnchor:[0,0]}),
@@ -2662,6 +2782,7 @@ function commitSearch(){
 let pendingFit = false;
 let qPrev = null;   // 検索窓に入る前のシートの高さ（入力を終えたら戻す。検索を確定したときは戻さない）
 function fitResults(){
+  pcSaved = null;
   const pts=lastVisible.filter(i=>markers[i]).map(i=>[lat[i], lng[i]]);
   if(!pts.length) return;
   if(mode!=='map') setMode('map');
@@ -2881,6 +3002,7 @@ function buildCityOptions(){
 
 /* いま表示している物件が収まるように地図を寄せる */
 function fitVisible(){
+  pcSaved = null;
   const pts=[];
   for(const i of lastVisible){ if(markers[i]) pts.push([lat[i], lng[i]]); }
   if(!pts.length){ showToast('地図に出せる物件がありません'); return; }
@@ -2899,12 +3021,80 @@ function setPaneView(v){
   if(v==='cond' && !MOBILE.matches) v = 'list';
   if(v==='cond' && paneView!=='cond') condFrom = paneView;
   paneView = v;
+  if(!MOBILE.matches) setPcDetail(v==='detail');
   $('#filters').dataset.view = v;
   $('#resultList').hidden = v!=='list';
   $('#paneBack').hidden = v!=='detail';
   if(v==='list') renderList();
   updateSheetHead();
   if(MOBILE.matches) SHEET.refresh();
+}
+/* PC: 物件を選んだ／一覧に戻ったときだけ、左右の配分を切り替える。
+   地図は「左の列が地図にかぶさる」ように見えるよう、幅が変わった分だけ横にずらす（中心で合わせると位置が大きく飛ぶため）。
+   一覧に戻ったとき、詳細を開いている間に利用者が地図を動かしていなければ、開く前の位置・ズームに戻す */
+let pcSaved=null, pcUserMoved=false, pcMapWide=false, pcModeNext='land';
+/* PC の詳細の構成: 表紙（1枚目）の写真で決める。写真送りでは変えない */
+function pcModeFor(i){
+  const pid=ids[i];
+  const dbFirst = !NO_PHOTO && photo[i] && !PHOTO_ORDER[pid];
+  if(dbFirst) return 'land';                       // 文化庁の写真（手元の版だけ）はほぼ横長
+  const mp = (MINE && MINE.byId[pid]) ? mineOrdered(pid) : [];
+  if(mp.length){ const ar = PHOTO_AR[mp[0].path]; return ar && ar < .95 ? 'port' : 'land'; }
+  if(!NO_PHOTO && photo[i]) return 'land';
+  return 'none';
+}
+try{ pcMapWide = localStorage.getItem('bunkazai-pcwide')==='1'; }catch(_){}
+function pcRelayout(fn){
+  const w0 = (typeof mapReady!=='undefined' && mapReady) ? map.getSize().x : 0;
+  fn();
+  if(!w0) return;
+  map.invalidateSize({pan:false});
+  const d = w0 - map.getSize().x;
+  if(d) map.panBy([d, 0], {animate:false});
+  const ph=$('#card .ph'), st=ph && ph.querySelector('.strip');
+  if(st && ph.dataset.ar) fitFrame(ph, st, +ph.dataset.ar);
+}
+function setPcDetail(on){
+  const b=document.body;
+  if(b.classList.contains('pc-detail')===on) return;
+  if(on && mapReady){ pcSaved={c:map.getCenter(), z:map.getZoom()}; pcUserMoved=false; }
+  const restore = !on && pcSaved && !pcUserMoved;
+  pcRelayout(()=>{ if(on) b.dataset.pcm = pcModeNext; b.classList.toggle('pc-detail', on); b.classList.toggle('pc-mapwide', on && pcMapWide); if(!on) setCondOpenPc(false); });
+  if(restore && mapReady) map.setView(pcSaved.c, pcSaved.z, {animate:false});
+  if(!on) pcSaved=null;
+  syncWideBtn();
+}
+function setMapWide(on){
+  pcMapWide=on;
+  try{ localStorage.setItem('bunkazai-pcwide', on ? '1' : '0'); }catch(_){}
+  if(!document.body.classList.contains('pc-detail')){ syncWideBtn(); return; }
+  pcRelayout(()=>document.body.classList.toggle('pc-mapwide', on));
+  syncWideBtn();
+  if(selI>=0){ revealCenter=false; revealPin(selI); }
+}
+function syncWideBtn(){
+  const b=$('#wideBtn'); if(!b) return;
+  b.textContent = pcMapWide ? '詳細を広げる' : '地図を広げる';
+  b.setAttribute('aria-pressed', pcMapWide ? 'true' : 'false');
+  b.title = pcMapWide ? '左の詳細を広くする' : '右の地図を広くする';
+}
+function setCondOpenPc(on){
+  document.body.classList.toggle('pc-cond-open', on);
+  const b=$('#condBtnPc'); if(b) b.setAttribute('aria-expanded', on ? 'true' : 'false');
+  // 条件を開くと詳細の見える高さが減るので、写真の高さを合わせ直す（物件名・主な操作をできるだけ画面に残す）
+  const ph=$('#card .ph'), st=ph && ph.querySelector('.strip'); if(st && ph.dataset.ar) fitFrame(ph, st, +ph.dataset.ar);
+}
+/* 適用中の条件の短い要約（物件を選んだ後の「条件」ボタンの下） */
+function condSummary(){
+  const parts=[];
+  if(F.city>=0) parts.push(IDX.cities[F.city]); else if(F.pref) parts.push(F.pref);
+  if(F.live) parts.push(LIVING.short||'現役稼働');
+  const ml = {1:'撮影済み', 2:'未撮影', 3:LBL.filter_photo, 4:LBL.visited, 5:LBL.not_visited, 6:LBL.saved||'行きたい'}[F.mine];
+  if(ml) parts.push(ml);
+  if(F.cat.size!==IDX.cats.length) parts.push(F.cat.size===1 ? IDX.cats[[...F.cat][0]] : '分類'+F.cat.size+'つ');
+  const more = moreActive() - (F.cat.size!==IDX.cats.length ? 1 : 0);
+  if(more>0) parts.push('詳細条件'+more+'件');
+  return parts;
 }
 /* 条件の画面を閉じて、結果（詳細から来たときは詳細）に戻る */
 function leaveCond(){
@@ -2936,6 +3126,9 @@ function updateSheetHead(){
   // 地図の上の「条件」ボタンに、絞り込んでいる条件の数
   const n = (F.pref||F.city>=0 ? 1 : 0) + (F.qRaw ? 1 : 0) + moreActive();
   const cn=$('#condN'); if(cn) cn.textContent = n ? n : '';
+  const cp=$('#condNPc'); if(cp) cp.textContent = (n + (F.live?1:0) + (F.mine?1:0)) || '';
+  const cs=$('#condSumPc');
+  if(cs){ const parts=condSummary(); cs.hidden=!parts.length; cs.textContent = parts.length ? '条件：'+parts.join('・')+'（'+lastVisible.length.toLocaleString()+'件）' : ''; }
 }
 function scheduleList(ms){ clearTimeout(listTimer); listTimer = setTimeout(()=>{ if(paneView==='list') renderList(); updateWelcomeCount(); }, ms==null ? 150 : ms); }
 /* 地図の範囲に入っている物件（今の条件で表示中のもの） */
@@ -2999,7 +3192,6 @@ function renderList(keepScroll){
     const i=+el.dataset.i;
     el.onclick=()=>{
       openCard(i, {from:'list'});
-      const m=markers[i]; if(m && !map.getBounds().contains(m.getLatLng())) map.panTo(m.getLatLng());
     };
     el.onmouseenter=el.onfocus=()=>hoverPin(i);
     el.onmouseleave=el.onblur=()=>hoverPin(-1);
@@ -3017,7 +3209,7 @@ function revealPin(i, center){
   if(!mapReady || !isFinite(lat[i])) return;
   if(center===undefined) center = revealCenter;
   const f=$('#filters');
-  const b = mapViewBox(SHEET.px(f, SHEET.state(f)||'mid'));
+  const b = MOBILE.matches ? mapViewBox(SHEET.px(f, SHEET.state(f)||'mid')) : pcViewBox();
   const p = map.latLngToContainerPoint([lat[i], lng[i]]);
   // 選んでいるピンは、先端（座標）から上へ しずく 約55px＋名前 約25px
   const UP = 82, DOWN = 4;
@@ -3027,8 +3219,8 @@ function revealPin(i, center){
   const ty = room > UP + DOWN + 20 ? (b.top + b.bottom)/2 + (UP - DOWN)/2 : b.bottom - DOWN - 6;
   const dx = p.x - b.width/2, dy = p.y - ty;
   if(!hidden && !(center && Math.hypot(dx, dy) > 24)) return;   // 地図のピンを押したときは、隠れるときだけ動かす
-  if(!autoPan) autoPan = map.getCenter();
-  map.panBy([dx, dy], {animate:true});
+  if(MOBILE.matches && !autoPan) autoPan = map.getCenter();
+  map.panBy([dx, dy], {animate:MOBILE.matches});
 }
 /* 一覧の行にマウスを乗せたとき・キーボードで選んだとき、地図の対応するピンに輪を出す */
 function hoverPin(i){
@@ -3327,6 +3519,9 @@ function buildUI(){
   });
   $('#resetAll').onclick=resetFilters;
   $('#backBtn').onclick=()=>closeCard();
+  $('#wideBtn').onclick=()=>setMapWide(!pcMapWide);
+  $('#condBtnPc').onclick=()=>setCondOpenPc(!document.body.classList.contains('pc-cond-open'));
+  syncWideBtn();
   $('#resMore').onclick=()=>{ resLimit+=50; renderList(true); };
   // サイト名の横の「by ときやど」（pages_config.json の public_labels.owner）
   const by=$('#brand .by'); if(by) by.textContent='by '+LBL.owner;
@@ -3397,7 +3592,13 @@ function buildUI(){
   // スマホ幅⇔パソコン幅の切り替え（change が来ない環境もあるので resize でも確かめる）
   let wasMobile=MOBILE.matches, rsz;
   const onWidth=()=>{
-    if(MOBILE.matches!==wasMobile){ wasMobile=MOBILE.matches; SHEET.init(); if(!MOBILE.matches && paneView==='cond') setPaneView(condFrom); if(mapReady) map.invalidateSize(); }
+    if(MOBILE.matches!==wasMobile){
+      wasMobile=MOBILE.matches; SHEET.init();
+      if(!MOBILE.matches && paneView==='cond') setPaneView(condFrom);
+      if(MOBILE.matches) document.body.classList.remove('pc-detail','pc-mapwide','pc-cond-open'); else setPcDetail(paneView==='detail');
+      if(curRec && !$('#card').classList.contains('hidden') && idIndex.has(curRec.id)) drawCard(curRec, cat[idIndex.get(curRec.id)]);
+      if(mapReady) map.invalidateSize();
+    }
     else SHEET.refresh();
   };
   MOBILE.addEventListener('change', onWidth);
@@ -3415,6 +3616,7 @@ function buildUI(){
     if(e.key==='Escape'){
       if(!$('#about').hidden){ closeAbout(); return; }
       if(!$('#zukan').hidden){ closeZukan(); return; }
+      if(!$('#phView').hidden){ closePhotoView(); return; }
       if(!$('#saved').hidden){ closeSaved(); return; }
       if(!$('#legendBox').hidden){ toggleLegend(false); return; }
       if(NEAR.picking){ cancelPick(); return; }
@@ -3422,8 +3624,13 @@ function buildUI(){
     }
     if($('#card').classList.contains('hidden')) return;
     if(e.key==='Escape') closeCard();
+    if(!$('#phView').hidden && gal.length>1 && (e.key==='ArrowLeft'||e.key==='ArrowRight')){
+      pvI=(pvI+(e.key==='ArrowRight'?1:-1)+gal.length)%gal.length; $('#phView')._show(); return;
+    }
     if(gal.length>1 && (e.key==='ArrowLeft'||e.key==='ArrowRight')){
-      galI=(galI+(e.key==='ArrowRight'?1:-1)+gal.length)%gal.length; drawSlide();
+      const bar=$('#card .phbar '+(e.key==='ArrowRight' ? '.nx' : '.pv'));
+      if(bar && !MOBILE.matches) bar.click();
+      else { galI=(galI+(e.key==='ArrowRight'?1:-1)+gal.length)%gal.length; drawSlide(); }
     }
   });
 }
@@ -4148,8 +4355,14 @@ function openCard(i, opts){
     paneFrom = paneView==='cond' ? (condFrom==='detail' ? 'list' : condFrom) : paneView;
     listScroll = scroller().scrollTop; cardOpener = document.activeElement;
   }
-  $('#backLabel').textContent = paneFrom==='intro' ? 'はじめにに戻る' : '一覧に戻る';
+  $('#backLabel').textContent = paneFrom==='intro' ? 'はじめにへ戻る' : '一覧へ戻る';
   curId = ids[i];
+  if(!MOBILE.matches){
+    pcModeNext = pcModeFor(i);
+    // 詳細を開いたまま別の物件に移ったときも、構成が変わるなら幅を合わせ直す
+    if(document.body.classList.contains('pc-detail') && document.body.dataset.pcm !== pcModeNext)
+      pcRelayout(()=>{ document.body.dataset.pcm = pcModeNext; });
+  }
   setPaneView('detail');
   hoverPin(-1);
   if(MOBILE.matches){
@@ -4161,6 +4374,8 @@ function openCard(i, opts){
     revealPin(i);
   }
   setSelected(i);
+  // PC: 幅が変わったあとで、選んだピンが見えている地図の範囲に入るように（地図のピンを押したときは隠れるときだけ）
+  if(!MOBILE.matches && mapReady){ revealCenter = !['map', 'url'].includes(cardFrom); revealPin(i); }
   $('#welcome').hidden=true;                 // カードを開いたら「ようこそ」は閉じる
   card.classList.remove('hidden');
   card.innerHTML = '<div class="loading" role="status">読み込み中…</div>';
@@ -4327,26 +4542,43 @@ function drawCard(r, ci){
     + row('登録', esc(r.registered))
     + (pageUrl ? '' : row('年代', esc(r.era)) + row('材質', esc(r.structure_material)) + row('建物の種類（推定）', tline)
         + row('時代', esc(r.period)) + row('登録番号', esc(r.register_no)));
-  $('#card').innerHTML =
-    '<div class="ph"></div>'
-    +'<div class="body">'
-    // 1. 写真・名称・地域
-    +'<p class="kicker">'+kicker+'</p>'
+  const headH = '<p class="kicker">'+kicker+'</p>'
     +'<h2>'+(pageUrl ? plink('pname', 'card_name', esc(r.name)) : esc(r.name))+'</h2>'
     +(r.kana?'<div class="kana">'+esc(r.kana)+'</div>':'')
     +'<p class="where">'+esc(area)+'<span class="dot">・</span>'+esc(ytxt)+'</p>'
+    + liveHtml(r.id);
+  const moreH = pageUrl ? plink('morebtn', 'card_detail', '詳しく見る →') : '';
+  // 現地で使う人のために、地図アプリは名称・所在地のすぐ近くに
+  const mapH = ci2>=0 && isFinite(lat[ci2]) ? '<a class="obtn mapapp" href="'+mapsUrl(ci2)+'" target="_blank" rel="noopener">地図アプリで開く ↗</a>' : '';
+  const pcOrder = !MOBILE.matches;     // PC は「物件名 → 写真と所在地・年代・操作 → 見どころ」、スマホは「写真 → 物件名 → 操作」（シートの中間の高さに合わせた順）
+  const pcm = document.body.dataset.pcm || 'land';
+  const PIN_ICON = '<svg class="hpin" viewBox="0 0 28 40" aria-hidden="true"><path d="M14 38C12 32 2 25 2 14A12 12 0 1 1 26 14C26 25 16 32 14 38Z" style="fill:var(--pin-main)"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>';
+  const pcHead = '<p class="kicker">'+kicker+'</p>'
+    +'<h2>'+PIN_ICON+'<span>'+(pageUrl ? plink('pname', 'card_name', esc(r.name)) : esc(r.name))+'</span></h2>'
+    +(r.kana?'<div class="kana" title="'+esc(r.kana)+'">'+esc(r.kana)+'</div>':'');
+  const pcInfo = '<dl class="facts2"><dt>所在地</dt><dd>'+esc(area)+'</dd><dt>'+(r.year_source==='estimated' ? '年代' : '竣工')+'</dt><dd>'+esc(ytxt)+'</dd></dl>'
     + liveHtml(r.id)
-    + enHtml(r.id)
-    +'<div class="saverow" id="saveBox"></div>'
-    + (pageUrl ? plink('morebtn', 'card_detail', '詳しく見る →') : '')
-    // 現地で使う人のために、地図アプリは名称・所在地のすぐ近くに
-    + (ci2>=0 && isFinite(lat[ci2]) ? '<a class="obtn mapapp" href="'+mapsUrl(ci2)+'" target="_blank" rel="noopener">地図アプリで開く ↗</a>' : '')
+    + (pcm==='none' ? '<div class="ph"></div>' : '')
+    + '<div class="cacts"><div class="g">'+moreH+mapH+'</div>'
+    + '<div class="g"><div class="saverow" id="saveBox"></div><button type="button" class="vquick" id="vQuick" aria-pressed="false">✓ 訪問を記録</button></div>'
+    + '<p class="anote">行きたい・訪問の記録は、この端末のブラウザにだけ保存されます</p></div>';
+  $('#card').innerHTML =
+    (pcOrder
+      ? '<div class="body chead">'+pcHead+'</div>'
+        +'<div class="cmid'+(pcm==='none' ? '' : ' has-photo')+'">'
+        + (pcm==='none' ? '' : '<div class="phcol"><div class="ph"></div><div class="phbar"></div></div>')
+        +'<div class="infocol">'+pcInfo+'</div></div>'
+        +'<div class="body">'
+        + enHtml(r.id)
+      : '<div class="ph"></div><div class="body">'
+        + headH + enHtml(r.id)
+        +'<div class="saverow" id="saveBox"></div>' + moreH + mapH)
     // 2. 見どころ
     + hlSec
     // 3. 見学・利用
     + useSec
     // 4. 訪問の記録（共有のボタンは物件ページだけ。物件ページが無い版ではカードに出す）
-    +'<section class="cs"><h3>'+(pageUrl ? '訪問の記録' : '訪問の記録・共有')+'</h3>'
+    +'<section class="cs visitsec"><h3>'+(pageUrl ? '訪問の記録' : '訪問の記録・共有')+'</h3>'
       +'<div class="visit" id="visitBox"></div>'
       + (pageUrl ? '' : '<div class="share"><button type="button" class="obtn copy" id="copyLink">'+COPY_LABEL+'</button>'
         +'<a class="obtn xshare" id="xShare" href="'+esc(xShareUrl(r))+'" target="_blank" rel="noopener">𝕏 でシェア</a></div>' + snsHtml(r))
@@ -4370,6 +4602,12 @@ function drawCard(r, ci){
   drawSlide();
   renderVisit(r.id);
   renderSave(r.id);
+  { const k=$('#card .chead .kana');
+    if(k && k.scrollWidth > k.clientWidth + 2){
+      k.classList.add('long'); k.tabIndex=0; k.setAttribute('role','button'); k.setAttribute('aria-expanded','false');
+      const t=()=>{ const o=k.classList.toggle('open'); k.setAttribute('aria-expanded', o?'true':'false'); const ph=$('#card .ph'), st=ph&&ph.querySelector('.strip'); if(st&&ph.dataset.ar) fitFrame(ph, st, +ph.dataset.ar); };
+      k.onclick=t; k.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); t(); } };
+    } }
   // 中身（写真の枠まで）が決まってから、シートの中間の高さを合わせ直し、選んだピンが隠れていないか確かめ直す
   if(MOBILE.matches && SHEET.state($('#filters'))){ SHEET.refresh(); const k=idxIndex(r.id); if(k>=0){ watchReveal(); setTimeout(()=>revealPin(k), 300); } }
   const dm=$('#descMore'); if(dm) dm.onclick=()=>{ const d=$('#desc'); const open=d.classList.toggle('clamp'); dm.textContent = open ? '続きを読む' : '閉じる'; };
@@ -4613,6 +4851,14 @@ let visitUrls=[];   // カードに出している写真の一時URL（開き直
 function renderVisit(id){
   const box=$('#visitBox'); if(!box) return;
   const ts=VISITS.times(id);
+  // PC: 操作の欄の「訪問を記録」（記録済みなら「訪問済み」。押すと下の記録の欄へ）。下の欄は記録があるときだけ出す
+  { const sec=box.closest('.cs'); if(sec) sec.classList.toggle('unvisited', !ts.length);
+    const q=$('#vQuick');
+    if(q){
+      q.textContent = ts.length ? '✓ 訪問済み'+(ts.length>1 ? '（'+ts.length+'回）' : '') : '✓ 訪問を記録';
+      q.setAttribute('aria-pressed', ts.length ? 'true' : 'false');
+      q.onclick = ts.length ? ()=>{ const s2=box.closest('.cs'); if(s2) s2.scrollIntoView({block:'start', behavior:'smooth'}); } : ()=>checkIn(id);
+    } }
   if(!ts.length){
     box.innerHTML='<button class="vbtn" id="vGo">✓ 行った（訪問を記録）</button>'
       +'<div class="vnote">押した日時で記録し、続けて写真も選べます。記録と写真はこの端末のブラウザにだけ保存されます。</div>'
@@ -4888,6 +5134,20 @@ async function copyLink(btn){
   setTimeout(()=>{ btn.textContent=COPY_LABEL; }, 1800);
 }
 
+/* 写真の拡大表示（PC）。←→ で送り、Esc・×・外側で閉じる。閉じたら元の写真にフォーカスを戻す */
+let pvI=0, pvBack=null;
+function openPhotoView(k){
+  const v=$('#phView'); pvI=k; pvBack=document.activeElement;
+  const show=()=>{ const c=gal[pvI]; v.querySelector('img').src = c[0];
+    v.querySelector('.cap').textContent = (galCap[pvI] ? galCap[pvI]+'　' : '') + (gal.length>1 ? (pvI+1)+' / '+gal.length : '');
+    v.querySelector('.pv').hidden = v.querySelector('.nx').hidden = gal.length<2; };
+  v.querySelector('.pv').onclick=e=>{ e.stopPropagation(); pvI=(pvI-1+gal.length)%gal.length; show(); };
+  v.querySelector('.nx').onclick=e=>{ e.stopPropagation(); pvI=(pvI+1)%gal.length; show(); };
+  v.querySelector('.x').onclick=closePhotoView;
+  v.onclick=e=>{ if(e.target===v) closePhotoView(); };
+  v._show=show; show(); v.hidden=false; v.querySelector('.x').focus();
+}
+function closePhotoView(){ const v=$('#phView'); if(v.hidden) return; v.hidden=true; if(pvBack && pvBack.focus) pvBack.focus({preventScroll:true}); }
 function drawSlide(){
   const ph=$('#card .ph'); if(!ph) return;
   ph.innerHTML='';
@@ -4921,19 +5181,39 @@ function drawSlide(){
     img.onerror=()=>{ ci++; if(ci<cands.length){ setSrc(cands[ci]); return; }
       img.remove(); bg.remove(); const e=document.createElement('div'); e.className='empty'; e.textContent='写真はまだありません'; sl.appendChild(e); };
     setSrc(cands[0]);
-    img.onclick=()=>{ if(gal.length>1) go(galI+1, true); };
-    if(k===0) img.addEventListener('load', ()=>fitFrame(ph, strip, img.naturalWidth/img.naturalHeight));
+    img.onclick=()=>{ if(!MOBILE.matches) openPhotoView(k); else if(gal.length>1) go(galI+1, true); };
+    if(!MOBILE.matches){   // PC: キーボードでも写真を選んで Enter で拡大表示
+      img.tabIndex=0; img.setAttribute('role','button'); img.setAttribute('aria-label','写真を拡大表示（'+(k+1)+' / '+gal.length+'）');
+      img.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPhotoView(k); } });
+    }
+    const knownAr = PHOTO_AR[String(cands[0]).replace(MINE_DIR, '')];
+    if(k===0 && knownAr) requestAnimationFrame(()=>fitFrame(ph, strip, knownAr));
+    else if(k===0) img.addEventListener('load', ()=>fitFrame(ph, strip, img.naturalWidth/img.naturalHeight));
     sl.appendChild(bg); sl.appendChild(img);
     if(galCap[k]){ const cap=document.createElement('div'); cap.className='pcap'; cap.textContent=galCap[k]; sl.appendChild(cap); }
     strip.appendChild(sl);
   });
   ph.appendChild(strip);
+  // PC: 枠の下の帯に撮影情報・写真送り・枚数
+  const bar=$('#card .phbar');
+  const updBar=()=>{ if(!bar) return;
+    const cap=bar.querySelector('.cap'), c=bar.querySelector('.c');
+    if(cap) cap.textContent = galCap[galI] || (NO_PHOTO ? '' : '写真：文化庁 国指定文化財等データベース');
+    if(c) c.textContent = (galI+1)+' / '+gal.length; };
+  if(bar){
+    bar.innerHTML='<span class="cap"></span>'+(gal.length>1 ? '<button type="button" class="pv" aria-label="前の写真">‹</button><span class="c"></span><button type="button" class="nx" aria-label="次の写真">›</button>' : '');
+    if(gal.length>1){
+      bar.querySelector('.pv').onclick=()=>go(galI-1, true);
+      bar.querySelector('.nx').onclick=()=>go(galI+1, true);
+    }
+  }
   const count=document.createElement('div'); count.className='pcount';
   function go(k, smooth){
     galI=(k+gal.length)%gal.length;
     const el=strip.children[galI];
     strip.scrollTo({left: el.offsetLeft, behavior: smooth ? 'smooth' : 'auto'});
     count.textContent=(galI+1)+' / '+gal.length;
+    updBar();
   }
   if(gal.length>1){
     const p=document.createElement('button'); p.className='nav prev'; p.textContent='‹'; p.setAttribute('aria-label','前の写真');
@@ -4949,7 +5229,7 @@ function drawSlide(){
         const max=strip.scrollWidth-strip.clientWidth;
         let k=0, best=1e9;
         [...strip.children].forEach((el,j)=>{ const d=Math.abs(Math.min(el.offsetLeft, max)-strip.scrollLeft); if(d<best){ best=d; k=j; } });
-        galI=k; count.textContent=(galI+1)+' / '+gal.length;
+        galI=k; count.textContent=(galI+1)+' / '+gal.length; updBar();
       }, 80);
     }, {passive:true});
   }
@@ -4961,14 +5241,40 @@ function drawSlide(){
    ただし高さは画面の 60%（スマホは 32%。下のシートを半分に開いたときに名前まで見えるように）まで */
 function fitFrame(ph, strip, ar){
   if(!ar || !isFinite(ar) || !ph.isConnected) return;
-  ar = Math.min(16/9, Math.max(4/5, ar));
-  const w = ph.clientWidth * (strip.classList.contains('multi') ? .88 : 1);   // 1枚ぶんの幅（2枚以上は次の写真の端を見せる分だけ狭い）
-  if(w < 50) return;
-  // スマホ: シートが半分のときでも、写真の下の名前の行が下端の「詳しく見る」に隠れない高さまで（画面の低い機種ほど低く）
+  ar = Math.min(16/9, Math.max(3/4, ar));
+  ph.dataset.ar = ar;
   const vh = window.innerHeight;
-  const cap = MOBILE.matches ? Math.max(100, Math.min(vh * .24, vh * .5 - 190)) : vh * .6;
+  if(MOBILE.matches){
+    const w = ph.clientWidth * (strip.classList.contains('multi') ? .88 : 1);   // 1枚ぶんの幅（2枚以上は次の写真の端を見せる分だけ狭い）
+    if(w < 50) return;
+    // スマホ: シートが半分のときでも、写真の下の名前の行が下端の「詳しく見る」に隠れない高さまで（画面の低い機種ほど低く）
+    const cap = Math.max(100, Math.min(vh * .24, vh * .5 - 190));
+    ph.style.aspectRatio = 'auto'; ph.style.width = '';
+    ph.style.height = Math.round(Math.min(w / ar, cap)) + 'px';
+    return;
+  }
+  // PC: 写真の列の幅と、左の列の見えている高さから決める
+  const cmid=$('#card .cmid'), pb=$('#paneBody'), head=$('#card .chead'), back=$('#paneBack'), bar=$('#card .phbar'), info=$('#card .infocol');
+  if(!cmid) return;
+  ph.style.width = '';
+  const cs = getComputedStyle(cmid), two = cs.gridTemplateColumns.trim().split(/\s+/).length > 1;
+  const inner = cmid.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const maxW = two ? inner - 22 - 230 : inner;
+  const fixed = (back && !back.hidden ? back.offsetHeight : 0) + (head ? head.offsetHeight : 0) + (bar ? bar.offsetHeight + 4 : 0) + 18;
+  // 1列（横写真）は写真の下の「所在地・年代・詳しく見る・地図アプリ」まで同じ画面に入るように（保存・記録はその下へ自然にスクロール）。
+  // 2列は操作が横にあるので写真だけ
+  let below = 0;
+  if(!two){
+    const g1 = $('#card .cacts .g');
+    below = (info && g1) ? (g1.getBoundingClientRect().bottom - info.getBoundingClientRect().top + 14) : 160;
+  }
+  let cap = pb.clientHeight - fixed - below;
+  cap = Math.max(170, Math.min(cap, vh * .7));
+  const h = Math.min(maxW / ar, cap);
+  const w = Math.min(maxW, h * ar);
   ph.style.aspectRatio = 'auto';
-  ph.style.height = Math.round(Math.min(w / ar, cap)) + 'px';
+  ph.style.height = Math.round(h) + 'px';
+  ph.style.width = Math.round(w) + 'px';
 }
 
 /* 計測用（コンソールから呼べる） */
