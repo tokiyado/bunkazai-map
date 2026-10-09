@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-09 09:20） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-09 09:33） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -865,6 +865,15 @@ body.picking .leaflet-interactive{pointer-events:none!important}
 #card .cs .share{display:flex; gap:8px; margin-top:12px; border-top:0; padding-top:0}
 #card .cs .share .obtn{flex:1 1 0}
 #card .cs .visit{margin-top:0}
+/* 検索・絞り込みの結果外の物件を開いているときの案内 */
+.outnote{display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin:0 0 10px; padding:6px 8px 6px 10px;
+  border-left:2px solid var(--line2); background:var(--hover); font-size:12px; color:var(--fg2); line-height:1.5}
+.outnote[hidden]{display:none}
+.outnote .t{flex:1 1 auto; min-width:0}
+.outnote button{flex:0 0 auto; min-height:32px; padding:0 12px; border:1px solid var(--line2); border-radius:16px; background:var(--panel);
+  color:var(--fg); font-size:12px; cursor:pointer; white-space:nowrap}
+.outnote button:hover{border-color:var(--fg)}
+@media (max-width: 768px){ .outnote button{min-height:40px} }
 /* 行きたい（保存）: 丸い枠のボタンと星。訪問の記録（四角いボタン・チェック）とは形も言葉も分ける */
 #card .saverow{display:flex; align-items:center; gap:10px; margin:2px 0 10px}
 .sbtn{display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:0 16px; border:1.5px solid var(--pin-main); border-radius:20px;
@@ -1484,7 +1493,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-09 09:20", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-09 09:33", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -2546,6 +2555,7 @@ function applyFilters(){
   $('#fBtnN').textContent = V<N ? '絞込中' : '';
   updatePaneTabs();
   renderActConds();
+  updateOutNote();
   $('#resetAll').hidden = !(V<N || F.qRaw);
   if(booted){
     // 初回のおすすめ（ようこそ）と検索結果は同時に出さない。条件を変えたら結果の一覧に切り替える
@@ -2812,6 +2822,46 @@ function fitResults(){
   const M = 24;   // まとまりの丸の半径ぶん（丸の中心が端に来ても丸ごと見えるように）
   map.fitBounds(pts, {paddingTopLeft:[left, Math.round(b.top + M)], paddingBottomRight:[right, Math.round(b.height - b.bottom + M)],
                       maxZoom:16, animate:false});
+}
+/* 検索・絞り込みの条件は残したまま、その結果に入っていない物件（周辺の文化財から移った物件など）を開いているとき:
+   詳細の上に「結果外の物件を表示中」と「検索結果へ戻る」を出す（検索欄の文字と詳細の名前が違う理由が分かるように） */
+function updateOutNote(){
+  const el=$('#outNote'); if(!el) return;
+  const i = curId!=null ? idIndex.get(curId) : null;
+  const out = i!=null && lastVisible.length < N && !lastVisible.includes(i);
+  const was = !el.hidden;
+  el.hidden = !out;
+  if(out){
+    el.querySelector('.t').textContent = F.qRaw ? '検索「'+F.qRaw+'」の結果外の物件を表示中' : '絞り込みの結果外の物件を表示中';
+    const b=el.querySelector('button');
+    b.textContent = F.qRaw ? '検索結果へ戻る' : '絞り込みの結果へ戻る';
+    b.onclick = backToResults;
+  }
+  if(was !== out){
+    const ph=$('#card .ph'), st=ph && ph.querySelector('.strip');
+    if(st && ph.dataset.ar) fitFrame(ph, st, +ph.dataset.ar);
+    if(MOBILE.matches && SHEET.state($('#filters'))) SHEET.refresh();
+  }
+}
+/* 検索・絞り込みの結果へ戻る: 1件だけならその物件を開き、複数なら一覧に戻して結果の全体が見える範囲に地図を合わせる */
+function backToResults(){
+  if(lastVisible.length===1){
+    const i=lastVisible[0];
+    if(markers[i] && !map.getBounds().contains(markers[i].getLatLng())) map.setView([lat[i], lng[i]], Math.max(map.getZoom(), 16), {animate:false});
+    openCard(i, {from:'search'});
+    return;
+  }
+  pcSaved = null;
+  closeCard();
+  let n=0;
+  const go=()=>{
+    if(!$('#card').classList.contains('hidden') && n++<20){ setTimeout(go, 30); return; }   // 「戻る」と同じ閉じ方なので、閉じ終わるのを待つ
+    $('#welcome').hidden=true;
+    if(paneView!=='list') setPaneView('list');
+    scroller().scrollTop=0;
+    fitResults();
+  };
+  setTimeout(go, 0);
 }
 /* 検索・地域を選んだあと: キーボードを閉じ、合った物件がすべて入る範囲へ地図を動かす。1件だけならその物件を開く */
 function showSearchResult(label){
@@ -4569,10 +4619,11 @@ function drawCard(r, ci){
   const pcOrder = !MOBILE.matches;     // PC は「物件名 → 写真と所在地・年代・操作 → 見どころ」、スマホは「写真 → 物件名 → 操作」（シートの中間の高さに合わせた順）
   const pcm = document.body.dataset.pcm || 'land';
   const PIN_ICON = '<svg class="hpin" viewBox="0 0 28 40" aria-hidden="true"><path d="M14 38C12 32 2 25 2 14A12 12 0 1 1 26 14C26 25 16 32 14 38Z" style="fill:var(--pin-main)"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>';
-  const pcHead = '<p class="kicker">'+kicker+'</p>'
+  const pcHead = '<div class="outnote" id="outNote" hidden><span class="t"></span><button type="button"></button></div>'+'<p class="kicker">'+kicker+'</p>'
     +'<h2>'+PIN_ICON+'<span>'+(pageUrl ? plink('pname', 'card_name', esc(r.name)) : esc(r.name))+'</span></h2>'
     +(r.kana?'<div class="kana" title="'+esc(r.kana)+'">'+esc(r.kana)+'</div>':'');
-  const pcInfo = '<dl class="facts2"><dt>所在地</dt><dd>'+esc(area)+'</dd><dt>'+(r.year_source==='estimated' ? '年代' : '竣工')+'</dt><dd>'+esc(ytxt)+'</dd></dl>'
+  const pcInfo = '<dl class="facts2"><dt>所在地</dt><dd>'+esc(area)+'</dd><dt>'+(r.year_source==='estimated' && r.year!=null ? '年代' : '竣工')+'</dt><dd>'
+      + esc(r.year==null ? '不明' : r.year_source==='estimated' ? ytxt : r.year+'年')+'</dd></dl>'
     + liveHtml(r.id)
     + (pcm==='none' ? '<div class="ph"></div>' : '')
     + '<div class="cacts"><div class="g">'+moreH+mapH+'</div>'
@@ -4591,6 +4642,7 @@ function drawCard(r, ci){
         +'<div class="body">'
         + enHtml(r.id)
       : '<div class="ph"></div><div class="body">'
+        + '<div class="outnote" id="outNote" hidden><span class="t"></span><button type="button"></button></div>'
         + headH + enHtml(r.id)
         +'<div class="saverow" id="saveBox"></div>' + moreH + mapH)
     // 2. 見どころ
@@ -4619,6 +4671,7 @@ function drawCard(r, ci){
     + (pageUrl ? plink('pagelink', 'card_page', '詳細ページ（基本データ・出典）を開く →') : '')
     +'</div>';
   galBase = gal.length;          // ここから後ろに「訪問の写真」を足す
+  updateOutNote();
   drawSlide();
   renderVisit(r.id);
   renderSave(r.id);
