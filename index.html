@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-08 17:06） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-09 09:20） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -593,6 +593,19 @@ select:focus{border-color:var(--line2)}
   #card .cs.visitsec.unvisited{display:none}
   #paneBody #card .body .cs, #paneBody #card .body > .en{max-width:40em}
   /* 縦写真で、詳細の中に十分な幅があるとき: 写真の右に所在地・年代・操作 */
+  /* --ph-w は fitFrame が写真の枠の幅を入れる（1列で写真があるときだけ）。写真なし・縦写真の横並びは今までどおり最大 520px */
+  #card .cmid.has-photo .cacts, #card .cmid.has-photo .infocol .live, #card .cmid.has-photo .phbar{max-width:var(--ph-w, 520px)}
+  /* 縦写真の横並びで、右の列の下が空くときに入れる「見どころ」（文化庁の解説の冒頭。行数は fitFrame が決める） */
+  #card .hlside{margin-top:12px; padding-top:10px; border-top:1px solid var(--line); max-width:520px}
+  #card .hlside[hidden]{display:none}
+  #card .hlside h3{margin:0 0 4px; font-family:var(--font-head); font-size:15px; font-weight:600; letter-spacing:.06em}
+  #card .hlside .qt{margin:0; font-size:13px; line-height:1.75; color:var(--fg2);
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:var(--hl-lines, 3); overflow:hidden}
+  #card .hlside footer{margin-top:4px; font-size:11px; color:var(--dim2)}
+  #card .hlside .readmore{margin-top:2px; padding:2px 0}
+  /* 右の列に解説を出したときは、下の「見どころ」で同じ解説を重複させない（ときやどのメモは下に残す） */
+  #card.hl-side .hlsec .hlq{display:none}
+  #card.hl-side .hlsec.only-q{display:none}
   @container (max-width: 459px){ #card .facts2{grid-template-columns:auto 1fr} #card .facts2 dd{margin-right:0} }
   @container (min-width: 600px){
     body[data-pcm="port"] #card .cmid.has-photo .facts2{grid-template-columns:auto 1fr}
@@ -793,8 +806,8 @@ body.picking .leaflet-interactive{pointer-events:none!important}
 #card .copy{margin-top:8px; text-align:center}
 #card .pagelink{display:block; margin-top:8px; text-align:center; text-decoration:none; color:var(--fg2)}
 /* 物件ページへの導線 */
-#card h2 a.pname{color:var(--fg); text-decoration:none; border-bottom:1px solid var(--line2)}
-#card h2 a.pname:hover{border-bottom-color:var(--fg)}
+#card h2 a.pname{color:var(--fg); text-decoration:none; border-bottom:0}
+#card h2 a.pname:hover, #card h2 a.pname:focus-visible{text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:5px}
 #card .morebtn{display:block; margin:2px 0 12px; padding:10px 12px; border-radius:3px; text-align:center; text-decoration:none;
   background:var(--brand); color:var(--brand-ink); font-size:13.5px; font-weight:600; letter-spacing:.06em; border:0}
 #card .morebtn:hover{opacity:.9}
@@ -1471,7 +1484,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-08 17:06", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-09 09:20", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -4523,11 +4536,11 @@ function drawCard(r, ci){
   const lv = LIVING.items[r.id];
   // 見どころ: ときやどのメモ（書いた物件だけ）と、文化庁の解説（引用）。推測で埋めない
   const hlSec = (cont.hl || r.desc)
-    ? '<section class="cs"><h3>見どころ</h3>'
+    ? '<section class="cs hlsec'+(cont.hl ? '' : ' only-q')+'"><h3>見どころ</h3>'
       + (cont.hl ? '<div class="ed"><p class="lbl">ときやどのメモ</p><div class="prose">'+cont.hl+'</div></div>' : '')
-      + (r.desc ? '<blockquote class="quote"><p class="qt clamp" id="desc">'+esc(r.desc)+'</p>'
+      + (r.desc ? '<div class="hlq"><blockquote class="quote"><p class="qt clamp" id="desc">'+esc(r.desc)+'</p>'
           + '<footer>文化庁「国指定文化財等データベース」の解説より</footer></blockquote>'
-          + (pageUrl ? plink('readmore', 'card_readmore', '解説の全文を読む →') : '<button type="button" class="readmore" id="descMore">続きを読む</button>') : '')
+          + (pageUrl ? plink('readmore', 'card_readmore', '解説の全文を読む →') : '<button type="button" class="readmore" id="descMore">続きを読む</button>')+'</div>' : '')
       + '</section>' : '';
   // 見学・利用: ときやどが確認した物件だけ（確認していない営業時間・入場の可否は出さない）
   const useSec = (lv || cont.visit || cont.info)
@@ -4564,7 +4577,11 @@ function drawCard(r, ci){
     + (pcm==='none' ? '<div class="ph"></div>' : '')
     + '<div class="cacts"><div class="g">'+moreH+mapH+'</div>'
     + '<div class="g"><div class="saverow" id="saveBox"></div><button type="button" class="vquick" id="vQuick" aria-pressed="false">✓ 訪問を記録</button></div>'
-    + '<p class="anote">行きたい・訪問の記録は、この端末のブラウザにだけ保存されます</p></div>';
+    + '<p class="anote">行きたい・訪問の記録は、この端末のブラウザにだけ保存されます</p></div>'
+    + (pcm==='port' && pageUrl && r.desc ? '<div class="hlside" id="hlSide" hidden><h3>見どころ</h3><p class="qt">'+esc(r.desc)+'</p>'
+        + '<footer>文化庁「国指定文化財等データベース」の解説より</footer>'
+        + plink('readmore', 'card_readmore', '解説の全文を読む →')+'</div>' : '');
+  $('#card').classList.remove('hl-side');
   $('#card').innerHTML =
     (pcOrder
       ? '<div class="body chead">'+pcHead+'</div>'
@@ -5278,6 +5295,23 @@ function fitFrame(ph, strip, ar){
   ph.style.aspectRatio = 'auto';
   ph.style.height = Math.round(h) + 'px';
   ph.style.width = Math.round(w) + 'px';
+  // 1列のとき: 操作の行などの幅を写真の枠にそろえる（ボタンの文字が折り返さない幅は確保する）
+  if(two) cmid.style.removeProperty('--ph-w'); else cmid.style.setProperty('--ph-w', Math.max(340, Math.round(w))+'px');
+  // 縦写真の横並び: 右の列の下の空きに、解説の冒頭を写真の下端までに入る行数だけ出す（3行入らなければ下の節のまま）
+  const side=$('#hlSide'), card=$('#card');
+  if(side){
+    let lines = 0;
+    if(two){
+      side.hidden = false; side.style.setProperty('--hl-lines', 1);
+      const qt = side.querySelector('.qt'), lh = parseFloat(getComputedStyle(qt).lineHeight) || 23;
+      const avail = ph.getBoundingClientRect().bottom - side.getBoundingClientRect().top;
+      lines = 1 + Math.floor((avail - side.offsetHeight) / lh);
+    }
+    const on = lines >= 3;
+    side.hidden = !on;
+    if(on) side.style.setProperty('--hl-lines', Math.min(lines, 12));
+    card.classList.toggle('hl-side', on);
+  }
   // 横写真（1列）で、写真が列の幅より狭くなったときは、左の列を写真の幅に合わせて右の余白をなくす
   const b=document.body;
   if(!two && b.dataset.pcm==='land' && b.classList.contains('pc-detail') && !b.classList.contains('pc-mapwide') && !fitFrame.busy){
