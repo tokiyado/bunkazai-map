@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>古宇田實が設計した登録有形文化財（建造物）｜3件</title>
+<meta name="description" content="古宇田實が設計した登録有形文化財（建造物）3件の一覧です。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://bunkazai.tokiyado.net/arch/%E5%8F%A4%E5%AE%87%E7%94%B0%E5%AF%A6/">
+<meta property="og:site_name" content="登録有形文化財マップ">
+<meta property="og:type" content="website">
+<meta property="og:title" content="古宇田實が設計した登録有形文化財（建造物）｜3件">
+<meta property="og:description" content="古宇田實が設計した登録有形文化財（建造物）3件の一覧です。">
+<meta property="og:url" content="https://bunkazai.tokiyado.net/arch/%E5%8F%A4%E5%AE%87%E7%94%B0%E5%AF%A6/">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../../assets/page.css?v=9c1bf9cb0a">
+<script>(function(){if(location.hostname!=='bunkazai.tokiyado.net')return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('js',new Date());gtag('config','G-W8EHXMSRNE');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-W8EHXMSRNE';document.head.appendChild(s);})();</script>
+</head>
+<body>
+<header class="top"><div class="in"><a class="site" href="../../">登録有形文化財マップ</a><nav aria-label="パンくずリスト"><ol class="crumbs"><li><a href="../../">地図</a></li><li><a href="../../arch/">設計者</a></li><li aria-current="page">古宇田實</li></ol></nav></div></header>
+<main>
+<h1 class="name">古宇田實が設計した登録有形文化財（建造物）</h1>
+<p class="lead">古宇田實（解説に出てくる所属：神戸高等工業学）が設計した登録有形文化財（建造物） 3 件です。</p>
+<p class="note">文化庁「国指定文化財等データベース」の解説文に、設計者の名前が書かれている物件から拾っています（「設計は○○」「○○の設計」など）。解説に書かれていない物件は入っていません。2件以上の設計者だけを載せています。</p>
+<section><h2>物件の一覧</h2><h3 class="sub"><span class="sw" style="background:var(--c10)"></span> 宗教（3件）</h3><ul class="plist"><li><a href="../../p/00002546/">清水寺庫裏</a><span class="m">静岡市葵区・1931年竣工</span></li><li><a href="../../p/00001710/">清水寺鐘楼</a><span class="m">静岡市葵区・1919年竣工</span></li><li><a href="../../p/00001112/">清水寺本堂</a><span class="m">静岡市葵区・1931年竣工</span></li></ul></section>
+<p><a href="../../arch/">設計者の一覧へ</a></p>
+</main>
+<footer class="site"><div class="in">出典：文化庁「<a href="https://kunishitei.bunka.go.jp/" rel="noopener" target="_blank">国指定文化財等データベース</a>」（登録有形文化財・建造物）。分類の推定・竣工年の推定・位置の一部は当サイトによるものです。地図：地理院タイル。<br><a href="../../">地図で探す</a>　<a href="../../pref/">都道府県別の一覧</a><br><span class="ga">アクセス解析に Google アナリティクスを使っています（Cookie を使い、ページの閲覧やリンクのクリックを個人を特定しない形で集計します）。送信される情報と送信先は <a href="../../external/">外部送信について</a> をご覧ください。</span></div></footer>
+<script>
+(function(){
+  function track(n,p){ try{ if(typeof gtag==='function') gtag('event',n,Object.assign({transport_type:'beacon'},p||{})); }catch(e){} }
+  var id=(location.pathname.match(/\/p\/(\d{8})\//)||[])[1]||'';
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest('[data-copy],[data-ev],a[href*="#id="]'); if(!a) return;
+    if(a.hasAttribute('data-copy')){
+      var u=a.getAttribute('data-copy'), done=function(ok){ a.textContent=ok?'コピーしました':'コピーできませんでした'; setTimeout(function(){a.textContent='リンクをコピー';},1800); };
+      if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(u).then(function(){done(true)},function(){done(false)}); } else { done(false); }
+      track('share',{method:'copy_link',content_type:'property',item_id:id});
+    } else if(a.getAttribute('data-ev')==='share_x'){ track('share',{method:'x',content_type:'property',item_id:id}); }
+    else { track('open_map',{property_id:id}); }
+  });
+  // 行きたい（保存）: 地図と同じ localStorage 'bunkazai-saved'（{物件ID: 保存した日時}）
+  var sp=document.querySelector('.savep'), sb=document.getElementById('saveBtn');
+  if(sp && sb && id){
+    var KEY='bunkazai-saved', label=sb.querySelector('.sl').textContent;
+    var load=function(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'{}'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }catch(e){ return null; } };
+    var draw=function(){ var o=load()||{}, on=typeof o[id]==='string';
+      sb.setAttribute('aria-pressed', on?'true':'false');
+      sb.querySelector('.st').textContent = on?'★':'☆';
+      sb.querySelector('.sl').textContent = on?'保存済み':label;
+      sp.querySelector('.svlist').hidden = !Object.keys(o).length; };
+    if(load()!==null){
+      sp.hidden=false; draw();
+      sb.addEventListener('click', function(){
+        var o=load()||{}, on=typeof o[id]!=='string';
+        if(on) o[id]=new Date().toISOString(); else delete o[id];
+        try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){ sb.querySelector('.sl').textContent='この端末では保存できません'; return; }
+        track(on?'save_property':'unsave_property', {property_id:id, link_location:'page'});
+        draw();
+      });
+      window.addEventListener('storage', function(e){ if(e.key===KEY) draw(); });
+    }
+  }
+  // 写真の送りボタン（マウスで操作する端末だけ）。JS が動かなくても、写真は横スクロールで見られる
+  var g=document.querySelector('.gallery.multi');
+  if(g && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches){
+    var wrap=document.createElement('div'); wrap.className='gwrap';
+    g.parentNode.insertBefore(wrap,g); wrap.appendChild(g); g.classList.add('js-nav');
+    var slides=[].slice.call(g.querySelectorAll('.slide'));
+    var cur=function(){ var x=g.scrollLeft, k=0, b=1e9; slides.forEach(function(s,j){ var d=Math.abs(Math.min(s.offsetLeft, g.scrollWidth-g.clientWidth)-x); if(d<b){b=d;k=j;} }); return k; };
+    var go=function(d){ var k=(cur()+d+slides.length)%slides.length; g.scrollTo({left:slides[k].offsetLeft, behavior:'smooth'}); };
+    [['prev','‹','前の写真',-1],['next','›','次の写真',1]].forEach(function(b){
+      var el=document.createElement('button'); el.type='button'; el.className='gnav '+b[0]; el.textContent=b[1];
+      el.setAttribute('aria-label',b[2]); el.onclick=function(){ go(b[3]); }; wrap.appendChild(el);
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||'')) return;
+      if(e.key==='ArrowLeft'){ go(-1); e.preventDefault(); } else if(e.key==='ArrowRight'){ go(1); e.preventDefault(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>

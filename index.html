@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-18 19:23） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-20 06:48） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -59,11 +59,20 @@
 /* 凡例（地図の右上の「凡例」ボタンから開く小さなパネル） */
 .lg-btn{min-width:44px; height:34px; padding:0 10px; border:0; background:var(--input-bg); color:var(--fg); font-size:12.5px; cursor:pointer}
 .lg-btn[aria-expanded="true"]{background:var(--sel); color:var(--sel-ink)}
-#legendBox{position:absolute; z-index:1007; width:min(300px, calc(100% - 24px)); max-height:calc(100% - 24px); overflow:auto;
+#legendBox, #baseBox{position:absolute; z-index:1007; width:min(300px, calc(100% - 24px)); max-height:calc(100% - 24px); overflow:auto;
   padding:10px 14px 12px; background:var(--panel-solid); border:1px solid var(--line2); border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.18)}
-#legendBox .lg-head{display:flex; align-items:center; justify-content:space-between; margin:0 0 6px; font-family:var(--font-head); font-size:14px; font-weight:600}
-#legendBox .x{width:36px; height:36px; border:0; background:none; color:var(--dim); font-size:18px; cursor:pointer}
-#legendBox .note{font-size:11px; color:var(--dim2); line-height:1.6; margin-top:4px}
+#legendBox .lg-head, #baseBox .lg-head{display:flex; align-items:center; justify-content:space-between; margin:0 0 6px; font-family:var(--font-head); font-size:14px; font-weight:600}
+#legendBox .x, #baseBox .x{width:36px; height:36px; border:0; background:none; color:var(--dim); font-size:18px; cursor:pointer}
+#legendBox .note, #baseBox .note{font-size:11px; color:var(--dim2); line-height:1.6; margin-top:4px}
+/* 今昔（地図の種類）: 今の地図・今の空中写真・昔の空中写真から選ぶ。昔の写真を見ている間はボタンの色を変え、年代を出す */
+.lg-btn.on{background:var(--sel); color:var(--sel-ink)}
+#baseBox .bm{display:grid; gap:2px; margin:2px 0 8px}
+#baseBox .bm label{display:flex; align-items:center; gap:10px; min-height:40px; font-size:13px; color:var(--fg); cursor:pointer}
+#baseBox .bm input{width:18px; height:18px; accent-color:var(--brand); flex:0 0 18px}
+#baseBox .bm small{display:block; font-size:11px; color:var(--dim2)}
+#baseBox .op{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--fg2); margin:4px 0 2px}
+#baseBox .op input{flex:1; accent-color:var(--brand)}
+#baseBox .op[hidden]{display:none}
 .legend li{display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--fg2); line-height:1.5}
 .legend li > svg, .legend .lg-cl{flex:0 0 18px}
 .legend .lg-cl{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%;
@@ -1453,6 +1462,13 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
     <div id="zkBody"></div>
   </div>
 </div>
+<div id="baseBox" role="dialog" aria-labelledby="bmTitle" hidden>
+  <div class="lg-head"><span id="bmTitle">今と昔（地図・空中写真）</span><button type="button" class="x" id="bmClose" aria-label="閉じる">×</button></div>
+  <div class="bm" id="bmList" role="radiogroup" aria-labelledby="bmTitle"></div>
+  <div class="op" id="bmOp" hidden><span>写真の濃さ</span><input type="range" id="bmOpacity" min="30" max="100" step="10" value="100" aria-label="写真の濃さ"><span id="bmOpN">100%</span></div>
+  <p class="note">昔の空中写真は、拡大（ズーム10以上。戦前は13以上）すると出ます。年代ごとに撮影した地域が限られ、写っていない所は今の地図のままです。
+    濃さを下げると、今の地図と重ねて見比べられます。出典：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院（地理院タイル）</a></p>
+</div>
 <div id="legendBox" role="dialog" aria-labelledby="lgTitle" hidden>
   <div class="lg-head"><span id="lgTitle">凡例（地図の印の見方）</span><button type="button" class="x" id="lgClose" aria-label="凡例を閉じる">×</button></div>
             <ul class="legend">
@@ -1546,7 +1562,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-18 19:23", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-10-20 06:48", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -1940,11 +1956,81 @@ function liveAt(cp){
   }
   return best;
 }
+/* ================= 今昔（地図の種類） =================
+   淡色地図の上に、選んだ空中写真（地理院タイル）を重ねる。ピンはいつも写真より手前。
+   選んだものと濃さは、この端末のブラウザにだけ覚えておく */
+const GSI_XYZ = 'https://cyberjapandata.gsi.go.jp/xyz/';
+const BASES = [
+  {id:'pale', label:'今の地図（淡色地図）', short:'今昔'},
+  {id:'photo', label:'今の空中写真', short:'写真', url:GSI_XYZ+'seamlessphoto/{z}/{x}/{y}.jpg', min:2, max:18, attr:'全国最新写真'},
+  {id:'gazo1', label:'1974〜1978年の空中写真', short:'1970年代', url:GSI_XYZ+'gazo1/{z}/{x}/{y}.jpg', min:10, max:17, attr:'空中写真 1974〜1978年'},
+  {id:'ort_old10', label:'1961〜1969年の空中写真', short:'1960年代', url:GSI_XYZ+'ort_old10/{z}/{x}/{y}.png', min:10, max:17, attr:'空中写真 1961〜1969年'},
+  {id:'ort_USA10', label:'1945〜1950年の空中写真', sub:'米軍撮影', short:'1940年代', url:GSI_XYZ+'ort_USA10/{z}/{x}/{y}.png', min:10, max:17, attr:'空中写真 1945〜1950年（米軍撮影）'},
+  {id:'ort_riku10', label:'1936〜1942年頃の空中写真', sub:'陸軍撮影・一部の地域のみ', short:'戦前', url:GSI_XYZ+'ort_riku10/{z}/{x}/{y}.png', min:13, max:18, attr:'空中写真 1936〜1942年頃（陸軍撮影）'},
+];
+const BASE_KEY = 'bunkazai-base';
+const BASE = {id:'pale', op:100, layer:null, hinted:false};
+function initBase(){
+  try{ const v=JSON.parse(localStorage.getItem(BASE_KEY)||'null'); if(v && BASES.some(b=>b.id===v.id)){ BASE.id=v.id; BASE.op=Math.max(30, Math.min(100, +v.op||100)); } }catch(_){}
+  $('#bmList').innerHTML = BASES.map(b=>'<label><input type="radio" name="bm" value="'+b.id+'"><span>'+esc(b.label)
+    +(b.sub ? '<small>'+esc(b.sub)+'</small>' : '')+'</span></label>').join('');
+  $('#bmList').addEventListener('change', e=>{ if(e.target.name==='bm') setBaseMap(e.target.value); });
+  $('#bmOpacity').addEventListener('input', e=>{ BASE.op=+e.target.value; if(BASE.layer) BASE.layer.setOpacity(BASE.op/100); $('#bmOpN').textContent=BASE.op+'%'; saveBase(); });
+  $('#bmClose').onclick=()=>toggleBase(false);
+  L.DomEvent.disableClickPropagation($('#baseBox')); L.DomEvent.disableScrollPropagation($('#baseBox'));
+  map.on('zoomend', baseZoomHint);
+  setBaseMap(BASE.id, true);
+}
+function saveBase(){ try{ localStorage.setItem(BASE_KEY, JSON.stringify({id:BASE.id, op:BASE.op})); }catch(_){} }
+function setBaseMap(id, quiet){
+  const b = BASES.find(x=>x.id===id) || BASES[0];
+  BASE.id = b.id;
+  if(BASE.layer){ BASE.layer.remove(); BASE.layer=null; }
+  if(b.url){
+    // 撮影した範囲の外・縮尺の外は何も描かない（下の淡色地図が見える）。拡大しすぎたときは一番細かいタイルを引き伸ばす
+    BASE.layer = L.tileLayer(b.url, {minZoom:b.min, maxNativeZoom:b.max, maxZoom:19, zIndex:2, opacity:BASE.op/100, detectRetina:false,
+      attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>（'+b.attr+'）'}).addTo(map);
+  }
+  const btn=$('#bmBtn');
+  if(btn){ btn.textContent=b.short; btn.classList.toggle('on', !!b.url); btn.title = b.url ? b.label+'を表示中（押すと切り替え）' : '昔の空中写真と見比べる'; }
+  const r=document.querySelector('#bmList input[value="'+b.id+'"]'); if(r) r.checked=true;
+  $('#bmOp').hidden = !b.url; $('#bmOpacity').value=BASE.op; $('#bmOpN').textContent=BASE.op+'%';
+  saveBase();
+  if(!quiet) baseZoomHint(true);
+}
+/* 昔の写真を選んだのに縮尺が小さくて写真が出ないときは、拡大するよう知らせる */
+function baseZoomHint(force){
+  const b = BASES.find(x=>x.id===BASE.id);
+  if(!b || !b.url || map.getZoom() >= b.min) return;
+  if(force===true || !BASE.hinted){ BASE.hinted=true; showToast(b.label+'は、もっと拡大すると表示されます', 3000); }
+}
+/* 今昔のパネルの開閉（凡例と同じく、ボタンのすぐ下に置く） */
+function toggleBase(open){
+  const box=$('#baseBox'), btn=$('#bmBtn'); if(!box || !btn) return;
+  if(open===undefined) open = box.hidden;
+  if(open){
+    toggleLegend(false);
+    const st=$('#stage'); if(box.parentNode!==st) st.appendChild(box);
+    const sr=st.getBoundingClientRect(), br=btn.getBoundingClientRect();
+    box.style.top = Math.round(br.bottom - sr.top + 6)+'px';
+    box.style.right = Math.round(sr.right - br.right)+'px';
+    let bottom = sr.bottom;
+    if(MOBILE.matches){ const f=$('#filters'); bottom = Math.min(bottom, f.getBoundingClientRect().top); }
+    const at=document.querySelector('.leaflet-control-attribution'); if(at) bottom -= at.offsetHeight;
+    box.style.maxHeight = Math.max(160, Math.round(bottom - br.bottom - 14))+'px';
+    box.hidden=false; btn.setAttribute('aria-expanded','true');
+    const r=document.querySelector('#bmList input:checked'); if(r) r.focus({preventScroll:true});
+  } else {
+    if(box.hidden) return;
+    box.hidden=true; btn.setAttribute('aria-expanded','false');
+  }
+}
 /* 凡例のパネルの開閉。パネルは地図の枠の中、凡例ボタンのすぐ下に置く */
 function toggleLegend(open){
   const box=$('#legendBox'), btn=$('#lgBtn'); if(!box || !btn) return;
   if(open===undefined) open = box.hidden;
   if(open){
+    if(typeof toggleBase==='function') toggleBase(false);
     const st=$('#stage'); if(box.parentNode!==st) st.appendChild(box);
     const sr=st.getBoundingClientRect(), br=btn.getBoundingClientRect();
     box.style.top = Math.round(br.bottom - sr.top + 6)+'px';
@@ -2104,6 +2190,21 @@ function initMap(){
     }
   });
   new Lg().addTo(map);
+  // 今昔ボタン（凡例の下）。押すと地図の種類（今の地図・今の空中写真・昔の空中写真）を選ぶパネルを開く
+  const Bm = L.Control.extend({
+    options:{position:'topright'},
+    onAdd(){
+      const wrap=L.DomUtil.create('div','leaflet-bar');
+      const b=L.DomUtil.create('button','lg-btn',wrap);
+      b.type='button'; b.id='bmBtn'; b.textContent='今昔'; b.setAttribute('aria-expanded','false'); b.setAttribute('aria-controls','baseBox');
+      b.title='昔の空中写真と見比べる';
+      L.DomEvent.disableClickPropagation(wrap);
+      b.onclick=()=>toggleBase();
+      return wrap;
+    }
+  });
+  new Bm().addTo(map);
+  initBase();
 
   map.on('click', e=>{
     if(NEAR.picking){ setBase(e.latlng.lat, e.latlng.lng); return; }
@@ -2157,7 +2258,7 @@ function mapSideBox(width){
   let left = 0, right = width;
   const zc = document.querySelector('.leaflet-control-zoom');
   if(zc && zc.offsetParent) left = Math.max(0, zc.getBoundingClientRect().right - mr.left) + 6;
-  for(const id of ['#lgBtn', '#locBtn']){
+  for(const id of ['#lgBtn', '#bmBtn', '#locBtn']){
     const e = $(id);
     if(e && e.offsetParent) right = Math.min(right, e.getBoundingClientRect().left - mr.left - 6);
   }
@@ -3591,6 +3692,7 @@ function buildUI(){
   $('#lgClose').onclick=()=>toggleLegend(false);
   L.DomEvent.disableClickPropagation($('#legendBox')); L.DomEvent.disableScrollPropagation($('#legendBox'));
   document.addEventListener('click', e=>{ if(!e.target.closest('#legendBox,#lgBtn')) toggleLegend(false); });
+  document.addEventListener('click', e=>{ if(!e.target.closest('#baseBox,#bmBtn')) toggleBase(false); });
   if(ADMIN){ $('#lgPhoto').textContent='撮影済み（自分の写真あり）'; $('#lgVisit').textContent='「行った」の記録あり、または撮影済み'; }
   else $('#lgPhoto').textContent=LBL.photo_caption+'の写真あり';
   $('#lgLive').textContent=(LIVING.short||'転活文化財')+'（'+(LIVING.en||'Adaptive reuse')+'・ときやどが確認した物件）';
@@ -3767,6 +3869,7 @@ function buildUI(){
       if(!$('#phView').hidden){ closePhotoView(); return; }
       if(!$('#saved').hidden){ closeSaved(); return; }
       if(!$('#legendBox').hidden){ toggleLegend(false); return; }
+      if(!$('#baseBox').hidden){ toggleBase(false); return; }
       if(NEAR.picking){ cancelPick(); return; }
       if(document.body.classList.contains('fopen')){ setFilterOpen(false); return; }
     }
