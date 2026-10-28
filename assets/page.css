@@ -205,6 +205,11 @@ section.maptop{margin-top:0; margin-bottom:22px}
 .savep .note{font-size:12px; color:var(--dim2)}
 .savep .svlist{font-size:12.5px}
 .savep .svlist[hidden]{display:none}
+/* 特徴のタグ（#看板建築 など）。押すとそのタグの一覧ページ */
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px}
+.tags .tg{display:inline-flex; align-items:center; min-height:28px; padding:0 10px; border:1px solid var(--line2); border-radius:14px;
+  font-size:12.5px; color:var(--fg2); text-decoration:none; background:transparent}
+.tags .tg:hover{border-color:var(--fg2); color:var(--fg)}
 
 /* 今入れる文化財（営業中）のピン。地図アプリ（build_html.py が差し込む）と物件ページの位置の地図（build_pages.py が
    page.css の後ろに付ける）で共通。CSS だけで動かす（ぼかし・回転は使わない）。
