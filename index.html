@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-10-29 07:41） -->
+<!-- このファイルは build_dist.py が template_all_map.html から生成しています。直接編集しないでください（2026-11-01 09:14） -->
 <title>登録有形文化財（建造物）全件マップ</title>
 <link rel="canonical" href="https://bunkazai.tokiyado.net/">
 <meta name="description" content="全国の登録有形文化財（建造物）14,000件あまりを地図で探せます。分類・竣工年・地名で絞り込み、近くの文化財も一覧できます。">
@@ -1568,7 +1568,7 @@ body.nophoto #card .ph.nophoto{min-height:0; height:auto!important; display:bloc
 "use strict";
 
 /* build_html.py が差し込む値（取得日・件数・元号表・版） */
-const BUILD = {"built": "2026-10-29 07:41", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
+const BUILD = {"built": "2026-11-01 09:14", "fetched": "2026-09-11〜2026-09-14", "total": 14885, "perCat": {"交通": 557, "治山治水": 225, "その他": 93, "産業1次": 140, "官公庁舎": 252, "生活関連": 332, "学校": 463, "文化福祉": 526, "産業2次": 1509, "産業3次": 1832, "宗教": 2258, "住宅": 6698}, "missing": 10, "photos": 14841, "estimated": 5285, "typeLow": 4199, "yearMin": 1333, "yearMax": 1990, "eraExample": "江戸後期＝1751–1830", "estimatedDb": 5217, "estimatedProvisional": 54};
 const GENGO = [["慶長",1596],["元和",1615],["寛永",1624],["正保",1644],["慶安",1648],["承応",1652],["明暦",1655],["万治",1658],["寛文",1661],["延宝",1673],["天和",1681],["貞享",1684],["元禄",1688],["宝永",1704],["正徳",1711],["享保",1716],["元文",1736],["寛保",1741],["延享",1744],["寛延",1748],["宝暦",1751],["明和",1764],["安永",1772],["天明",1781],["寛政",1789],["享和",1801],["文化",1804],["文政",1818],["天保",1830],["弘化",1844],["嘉永",1848],["安政",1854],["万延",1860],["文久",1861],["元治",1864],["慶応",1865],["明治",1868],["大正",1912],["昭和",1926],["平成",1989],["令和",2019]];   // [[元号, 開始年], ...]
 /* 版: "" = 通常版（写真あり・data/js を読む）
        "standalone" = 写真抜き単一ファイル（データ埋め込み） / "site" = 写真抜き静的サイト（data/ を読む）
@@ -2231,16 +2231,6 @@ function initMap(){
 const JP_BOUNDS = [[31.0,129.5],[45.6,145.8]];
 /* 日本の四島（北海道〜九州）。最初に開いたときにこれが画面いっぱいに収まるようにする */
 const JP_MAIN = [[31.15,129.7],[45.45,145.6]];   // 北は宗谷岬、南は佐多岬、西は五島の手前、東は根室半島
-const VIEW_KEY = 'bunkazai-view';            // 前回見ていた位置（この端末のブラウザにだけ保存）
-function savedView(){
-  try{ const v=JSON.parse(localStorage.getItem(VIEW_KEY)||'null');
-       if(v && isFinite(v.lat) && isFinite(v.lng) && isFinite(v.z)) return v; }catch(_){}
-  return null;
-}
-function saveView(){
-  if(!mapReady) return;
-  try{ const c=map.getCenter(); localStorage.setItem(VIEW_KEY, JSON.stringify({lat:+c.lat.toFixed(5), lng:+c.lng.toFixed(5), z:map.getZoom()})); }catch(_){}
-}
 /* 四島を収める。panelRight: このあと「ようこそ」が出る（パソコンは右のパネルの幅、スマホは下半分のシートを除く） */
 /* PC で見えている地図の範囲: 上下は地図の端から少し内側、下は出典表示の帯の上まで */
 function pcViewBox(){
@@ -2305,13 +2295,10 @@ function initialView(H){
                     Object.assign(fitPad(40), {maxZoom:16, animate:false}));
     }
     else {
-      // 位置の指定が無いとき: 前回見ていた位置、無ければ四島を画面いっぱいに（このあと右に「ようこそ」が出る）
-      const sv = savedView();
-      if(sv) map.setView([sv.lat, sv.lng], Math.max(4, Math.min(18, sv.z)), {animate:false});
-      else fitJapan(true);
+      // 位置の指定が無いとき: 毎回、四島を画面いっぱいに（このあと右に「ようこそ」が出る）
+      fitJapan(true);
     }
     mapReady = true;
-    map.on('moveend', saveView);
     map.on('moveend', ()=>{ if(LOC.quiet) return; resLimit = 50; scheduleList(); });
     map.on('dragstart zoomstart', ()=>{ autoPan = null; });
     map.on('dragstart', ()=>{ pcUserMoved = true; });
